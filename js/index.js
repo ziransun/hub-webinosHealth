@@ -25,6 +25,12 @@ $(document).ready(function() {
     init();
     addProfileTab();
     addListener();
+
+    $("#close").click(function() {
+        $("#dialog-container").fadeOut();
+    });
+
+
 });
 
 
@@ -148,7 +154,8 @@ function addMyBaby() {
     //TODO the input type date is supported by Chrome but not by Firefox
     htmlCode += 'Birthdate: <input type=\'date\' id=\'myBabyDate\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMyBaby()\'>';
-    $('#addMyBaby').html(htmlCode);
+    $('#dialog-content').html(htmlCode);
+    $("#dialog-container").fadeIn(1000);
 }
 
 
@@ -162,6 +169,7 @@ function saveMyBaby() {
     babyInfo.name = babyName;
     babyInfo.birthdate = new Date(babyDate);
     mybabyList.push(babyInfo);
+    $("#dialog-container").fadeOut();
     addBabyTab(babyInfo.name, true, mybabyList.length-1);
     refreshTabLinks();
 }
@@ -432,7 +440,8 @@ function askMomInfo() {
     htmlCode += 'Mother name: <input type=\'text\' id=\'momMotherName\'><br>';
     htmlCode += 'Mother birthdate: <input type=\'date\' id=\'momMotherDate\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMomInfo()\'>';
-    $('#target').html(htmlCode);
+    $('#dialog-content').html(htmlCode);
+    $("#dialog-container").fadeIn(1000);
 }
 
 
@@ -443,6 +452,7 @@ function saveMomInfo() {
     momInfo.birthdate = new Date($('#momMotherDate').val());
     //TODO check that input values are valid
     storeMomInfo(momInfo);
+    $("#dialog-container").fadeOut();
     addMomTabs();
 }
 
