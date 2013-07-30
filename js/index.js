@@ -327,7 +327,7 @@ function refreshTabLinks() {
             }
             prevType = tabList[i].type;
         }
-        htmlCode += '<input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\'><br>';
+        htmlCode += '<input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\' class=\'buttonTab\'><br>';
         $('#leftcolumn').append(htmlCode);
         (function(ln, tn) {
             $('#'+ln).click(function() {displayTab(tn)});
@@ -341,7 +341,9 @@ function displayTab(tabId) {
     for (i in tabList) {
         $('#'+tabList[i].tabId).hide();
     }
+    $('.buttonTabSelected').removeClass('buttonTabSelected').addClass('buttonTab');
     $('#'+tabId).show();
+    $('#'+tabId+'Link').removeClass('buttonTab').addClass('buttonTabSelected');
 }
 
 
@@ -491,11 +493,11 @@ function addMomTabs() {
         var link = tabId+'Link';
         htmlCode = '';
         htmlCode += '<td>';
-        htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\'><br>';
+        htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'><br>';
         htmlCode += '</td>';
         $('#momInnerTabs').append(htmlCode);
         (function(ln, tn) {
-            $('#'+ln).click(function() {displayMomInnerTab(tn)});
+            $('#'+ln).click(function() {displayMomInnerTab(ln, tn)});
         })(link, tabId);
     }
     htmlCode = '</tr></table>';
@@ -517,7 +519,10 @@ function addMomTabs() {
 }
 
 
-function displayMomInnerTab(tn) {
+function displayMomInnerTab(ln, tn) {
+    $('.buttonInnerTabSelected').removeClass('buttonInnerTabSelected').addClass('buttonInnerTab');
+    $('#'+ln).removeClass('buttonInnerTab').addClass('buttonInnerTabSelected');
+    //TODO Handle graph display
     alert(tn);
 }
 
