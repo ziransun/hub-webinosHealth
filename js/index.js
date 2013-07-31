@@ -11,6 +11,7 @@ var momInfo = null;
 
 var tabList = new Array();
 var momInnerTabList = new Array();
+var babyInnerTabList = new Array();
 
 var tabVisible = 0;
 var babyList = new Array();    //Midwife
@@ -30,22 +31,35 @@ $(document).ready(function() {
         $("#dialog-container").fadeOut();
     });
 
-
 });
 
 
 function init() {
     momInnerTabList[0] = {
         'tabId': 'momIT0',
-        'displayName': 'Blood pressure'
+        'displayName': 'Blood pressure',
+        'type': 0
     };
     momInnerTabList[1] = {
         'tabId': 'momIT1',
-        'displayName': 'Blood sugar'
+        'displayName': 'Blood sugar',
+        'type': 1
     };
     momInnerTabList[2] = {
         'tabId': 'momIT2',
-        'displayName': 'Heartrate'
+        'displayName': 'Heartrate',
+        'type': 2
+    };
+
+    babyInnerTabList[0] = {
+        'tabId': 'babyIT0',
+        'displayName': 'Weight',
+        'type': 10
+    };
+    babyInnerTabList[1] = {
+        'tabId': 'babyIT1',
+        'displayName': 'Temperature',
+        'type': 11
     };
 }
 
@@ -205,10 +219,12 @@ function addBabyTab(tabName, isMine, babyId) {
     }
     var tabLinkName = tabId+'Link';
     //Prepare tab content
-    var tabAWB = tabId+'AWB';
-    var tabATB = tabId+'ATB';
-    var tabSWB = tabId+'SWB';
-    var tabSTB = tabId+'STB';
+//    var tabAWB = tabId+'AWB';
+//    var tabATB = tabId+'ATB';
+//    var tabSWB = tabId+'SWB';
+//    var tabSTB = tabId+'STB';
+    var tabInnerTabs = tabId+'InnerTabs';
+    var tabInnerGraphs = tabId+'InnerGraphs';
     var tabRB = tabId+'RB';
     var htmlCode = '';
     htmlCode += '<div id=\''+tabId+'\'>';
@@ -251,6 +267,14 @@ function addBabyTab(tabName, isMine, babyId) {
     htmlCode += 'Age (total days): '+age_totdays+'<br>';
     htmlCode += 'Age : '+age_years+' years, '+age_months+' months<br>';
     htmlCode += '<br><br>';
+    htmlCode += '<div id=\''+tabInnerTabs+'\'></div>';
+    htmlCode += '<div id=\''+tabInnerGraphs+'\'></div>';
+    htmlCode += '<br><br>';
+    htmlCode += '<input type=\'button\' value=\'Remove\' id=\''+tabRB+'\'><br>';
+    htmlCode += '</div>';
+    $('#target').append(htmlCode);
+    $('#'+tabId).hide();
+/*
     if(isMine) {
         htmlCode += '<input type=\'button\' value=\'Acquire weight\' id=\''+tabAWB+'\'><br>';
         htmlCode += '<input type=\'button\' value=\'Acquire temperature\' id=\''+tabATB+'\'><br>';
@@ -282,7 +306,41 @@ function addBabyTab(tabName, isMine, babyId) {
     (function(ln, tn) {
         $('#'+ln).click(function() {removeTab(tn)});
     })(tabRB, tabId);
-    $('#'+tabId).hide();
+*/
+    //Baby page inner tab links
+    var babyTabIds = new Array();
+    for(var i=0; i<babyInnerTabList.length; i++) {
+        var BITtabId = tabInnerTabs+babyInnerTabList[i].tabId;
+        babyTabIds[i] = {};
+        babyTabIds[i].tabId = BITtabId;
+    }
+    htmlCode = '';
+    htmlCode += '<table><tr>';
+    $('#'+tabInnerTabs).html(htmlCode);
+    for(var i=0; i<babyInnerTabList.length; i++) {
+        var BITlink = babyTabIds[i].tabId+'Link';
+        htmlCode = '';
+        htmlCode += '<td>';
+        htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '</td>';
+        $('#'+tabInnerTabs).append(htmlCode);
+        (function(ln, tn, tabList) {
+            $('#'+ln).click(function() {displayTab(tn, tabList, 'buttonInnerTabSelected', 'buttonInnerTab')});
+        })(BITlink, babyTabIds[i].tabId, babyTabIds);
+    }
+    htmlCode = '</tr></table>';
+    $('#'+tabInnerTabs).append(htmlCode);
+
+    //Baby page inner tabs
+    for(var i=0; i<babyInnerTabList.length; i++) {
+        htmlCode = '';
+        htmlCode += '<div id=\''+babyTabIds[i].tabId+'\'>';
+        htmlCode += 'Showing baby '+babyInnerTabList[i].displayName;
+        htmlCode += '</div>';
+        $('#'+tabInnerGraphs).append(htmlCode);
+        $('#'+babyTabIds[i].tabId).hide();
+    }
+
     //Add to tab list
     var tabElement = {};
     tabElement.tabId = tabId;
@@ -304,6 +362,14 @@ function addBabyTab(tabName, isMine, babyId) {
         tabList.splice(1, 0, tabElement);
         refreshTabLinks();
     } 
+}
+
+
+function displayBabyInnerTab(ln, tn, type, graphId) {
+    $('.buttonInnerTabSelected').removeClass('buttonInnerTabSelected').addClass('buttonInnerTab');
+    $('#'+ln).removeClass('buttonInnerTab').addClass('buttonInnerTabSelected');
+    //TODO Handle graph display
+    displayGraph(graphId, type);
 }
 
 
@@ -330,12 +396,13 @@ function refreshTabLinks() {
         htmlCode += '<input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\' class=\'buttonTab\'><br>';
         $('#leftcolumn').append(htmlCode);
         (function(ln, tn) {
-            $('#'+ln).click(function() {displayTab(tn)});
+            //$('#'+ln).click(function() {displayTab(tn)});
+            $('#'+ln).click(function() {displayTab(tn, tabList, 'buttonTabSelected', 'buttonTab')});
         })(link, tabId);
     }
 }
 
-
+/*
 function displayTab(tabId) {
     //alert(tabId);
     for (i in tabList) {
@@ -345,7 +412,7 @@ function displayTab(tabId) {
     $('#'+tabId).show();
     $('#'+tabId+'Link').removeClass('buttonTab').addClass('buttonTabSelected');
 }
-
+*/
 
 function removeTab(tabId) {
     $('#'+tabId).remove();
@@ -355,7 +422,8 @@ function removeTab(tabId) {
         }
     }
     refreshTabLinks();
-    displayTab(tabList[0].tabId);
+    //displayTab(tabList[0].tabId);
+    displayTab(tabList[0].tabId, tabList, 'buttonTabSelected', 'buttonTab');
 }
 
 
@@ -484,7 +552,7 @@ function addMomTabs() {
     htmlCode += '</div>';
     $('#target').append(htmlCode);
 
-    //Mom page inner tabs
+    //Mom page inner tab links
     htmlCode = '';
     htmlCode += '<table><tr>';
     $('#momInnerTabs').html(htmlCode);
@@ -496,12 +564,23 @@ function addMomTabs() {
         htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'><br>';
         htmlCode += '</td>';
         $('#momInnerTabs').append(htmlCode);
-        (function(ln, tn) {
-            $('#'+ln).click(function() {displayMomInnerTab(ln, tn)});
-        })(link, tabId);
+        (function(ln, tn, tabList) {
+            $('#'+ln).click(function() {displayTab(tn, tabList, 'buttonInnerTabSelected', 'buttonInnerTab')});
+        })(link, tabId, momInnerTabList);
     }
     htmlCode = '</tr></table>';
     $('#momInnerTabs').append(htmlCode);
+
+    //Mom page inner tabs
+    for(var i=0; i<momInnerTabList.length; i++) {
+        var tabId = momInnerTabList[i].tabId;
+        htmlCode = '';
+        htmlCode += '<div id=\''+momInnerTabList[i].tabId+'\'>';
+        htmlCode += 'Showing mom '+momInnerTabList[i].displayName;
+        htmlCode += '</div>';
+        $('#momInnerGraphs').append(htmlCode);
+        $('#'+momInnerTabList[i].tabId).hide();
+    }
 
     var tabElement = {};
     tabElement.tabId = 'momTab';
@@ -515,15 +594,8 @@ function addMomTabs() {
     }
 
     refreshTabLinks();
-    displayTab(tabList[0].tabId);
-}
-
-
-function displayMomInnerTab(ln, tn) {
-    $('.buttonInnerTabSelected').removeClass('buttonInnerTabSelected').addClass('buttonInnerTab');
-    $('#'+ln).removeClass('buttonInnerTab').addClass('buttonInnerTabSelected');
-    //TODO Handle graph display
-    alert(tn);
+    //displayTab(tabList[0].tabId);
+    displayTab(tabList[0].tabId, tabList, 'buttonTabSelected', 'buttonTab');
 }
 
 
@@ -585,7 +657,8 @@ function launchPage(){
             addMidwifeTabs();
 
             refreshTabLinks();
-            displayTab(tabList[0].tabId);
+            //displayTab(tabList[0].tabId);
+            displayTab(tabList[0].tabId, tabList, 'buttonTabSelected', 'buttonTab');
         });
     }
     else if (profileVal === "Profile") {
@@ -611,6 +684,28 @@ function newBabyConnection() {
     var motherName = $('#midwifeMotherName').val();
     alert('New baby connection with baby '+babyName+' and mother '+motherName);
     connectToBaby(babyName, motherName);
+}
+
+
+// General functions for tab handling
+
+/*
+ * This function displays the tab selected identified by tabId and changes the class
+ * of corresponding links. The id of links id tabId+'Link'.
+ * tabId: selected tab
+ * allTabs: array with all tabs
+ * tabSelectedClass: class of of the link corresponding to a tab selected
+ * tabUnselectedClass: class of of the link corresponding to a tab not selected
+ *
+ */
+function displayTab(tabId, allTabs, tabSelectedClass, tabUnselectedClass) {
+    //alert(tabId);
+    for (i=0; i<allTabs.length; i++) {
+        $('#'+allTabs[i].tabId).hide();
+        $('#'+allTabs[i].tabId+'Link').removeClass(tabSelectedClass).addClass(tabUnselectedClass);
+    }
+    $('#'+tabId).show();
+    $('#'+tabId+'Link').removeClass(tabUnselectedClass).addClass(tabSelectedClass);
 }
 
 
