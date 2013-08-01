@@ -9,17 +9,29 @@ function queryBabyInfo(cbk) {
     //TODO remove this part - it's temporary while baby list is not saved somewhere...
     var babyInfo = {};
     babyInfo.name = 'Gollum';
+    babyInfo.surname = 'Gollum';
     babyInfo.birthdate = new Date(2013, 2, 12);
+    babyInfo.motherName = 'Elizabeth';
+    babyInfo.motherSurname = 'Fuller';
+    babyInfo.motherBirthdate = new Date(1952, 3, 5);
     result.push(babyInfo);
 
     babyInfo = {};
     babyInfo.name = 'Sam';
+    babyInfo.surname = 'Gamgee';
     babyInfo.birthdate = new Date(2012, 11, 7);
+    babyInfo.motherName = 'Vilma';
+    babyInfo.motherSurname = 'Truman';
+    babyInfo.motherBirthdate = new Date(1973, 8, 26);
     result.push(babyInfo);
 
     babyInfo = {};
-    babyInfo.name = 'Pipino';
+    babyInfo.name = 'Pippin';
+    babyInfo.surname = 'Took';
     babyInfo.birthdate = new Date(2012, 4, 28);
+    babyInfo.motherName = 'Ada';
+    babyInfo.motherSurname = 'Berthod';
+    babyInfo.motherBirthdate = new Date(1986, 1, 9);
     result.push(babyInfo);
 
     cbk(result);
@@ -35,6 +47,7 @@ function queryMyBabyInfo(cbk) {
     //TODO remove this part - it's temporary while baby list is not saved somewhere...
     var babyInfo = {};
     babyInfo.name = 'Frodo';
+    babyInfo.surname = 'Baggins';
     babyInfo.birthdate = new Date(2013, 5, 20);
     result.push(babyInfo);
 
@@ -67,8 +80,9 @@ function queryMomInfo(cbk) {
     }
 
     result = {};
-    result.name = 'Mommy name';
-    result.birthdate = new Date(64, 1, 1);
+    result.name = 'Nicole';
+    result.surname = 'Kidman';
+    result.birthdate = new Date(67, 5, 20);
 
     cbk(result);
     //return result;

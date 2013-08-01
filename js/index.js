@@ -165,6 +165,7 @@ function addMyBaby() {
     var htmlCode = '';
     htmlCode += '<br><br>Add my new baby<br>';
     htmlCode += 'Name: <input type=\'text\' id=\'myBabyName\'><br>';
+    htmlCode += 'Surname: <input type=\'text\' id=\'myBabySurname\'><br>';
     //TODO the input type date is supported by Chrome but not by Firefox
     htmlCode += 'Birthdate: <input type=\'date\' id=\'myBabyDate\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMyBaby()\'>';
@@ -174,18 +175,19 @@ function addMyBaby() {
 
 
 function saveMyBaby() {
-    console.log("saveMyBaby");
     var babyName = $('#myBabyName').val();
-    console.log("babyName", babyName );
+    var babySurname = $('#myBabySurname').val();
     var babyDate = $('#myBabyDate').val();
     $('#addMyBaby').html('');
     var babyInfo = {};
     babyInfo.name = babyName;
+    babyInfo.surname = babySurname;
     babyInfo.birthdate = new Date(babyDate);
     mybabyList.push(babyInfo);
     $("#dialog-container").fadeOut();
     addBabyTab(babyInfo.name, true, mybabyList.length-1);
     refreshTabLinks();
+    displayTab(tabList[0].tabId, tabList, 'buttonTabSelected', 'buttonTab');
 }
 
 /*
@@ -227,50 +229,35 @@ function addBabyTab(tabName, isMine, babyId) {
     var tabInnerGraphs = tabId+'InnerGraphs';
     var tabRB = tabId+'RB';
     var htmlCode = '';
+    var age;
     htmlCode += '<div id=\''+tabId+'\'>';
-    htmlCode += '<br><br>';
+    htmlCode += '<table>';
     if(isMine) {
-        //console.log("isMine:", mybabyList[babyId].name);
-        htmlCode += 'Name: '+mybabyList[babyId].name+'<br>';
-        
-        htmlCode += 'Birthdate: '+mybabyList[babyId].birthdate.toDateString()+'<br>';
-    }
-    else
-    {
-        htmlCode += 'Name: '+babyList[babyId].name+'<br>';
-        htmlCode += 'Birthdate: '+babyList[babyId].birthdate.toDateString()+'<br>';
-    }    
-    var today = new Date();
-    if(isMine) {    
-        var age_ms = today - mybabyList[babyId].birthdate;
-    }
-    else
-        var age_ms = today - babyList[babyId].birthdate;
-    var age_totdays = Math.floor(age_ms/(1000*3600*24));
-    if(isMine) {
-        var age_days = today.getDate() - mybabyList[babyId].birthdate.getDate();
-        var age_months = today.getMonth() - mybabyList[babyId].birthdate.getMonth();
-        var age_years = today.getFullYear() - mybabyList[babyId].birthdate.getFullYear();
+        htmlCode += '<tr><td>Name</td><td>'+mybabyList[babyId].name+'</td></tr>';
+        htmlCode += '<tr><td>Surname</td><td>'+mybabyList[babyId].surname+'</td></tr>';
+        htmlCode += '<tr><td>Birthdate</td><td>'+mybabyList[babyId].birthdate.toDateString()+'</td></tr>';
+        age = getAge(mybabyList[babyId].birthdate);
     }
     else {
-        var age_days = today.getDate() - babyList[babyId].birthdate.getDate();
-        var age_months = today.getMonth() - babyList[babyId].birthdate.getMonth();
-        var age_years = today.getFullYear() - babyList[babyId].birthdate.getFullYear();
-    }    
-    if(age_days<0) {
-        age_months --;
+        htmlCode += '<tr><td>Name</td><td>'+babyList[babyId].name+'</td></tr>';
+        htmlCode += '<tr><td>Surname</td><td>'+babyList[babyId].surname+'</td></tr>';
+        htmlCode += '<tr><td>Birthdate</td><td>'+babyList[babyId].birthdate.toDateString()+'</td></tr>';
+        age = getAge(babyList[babyId].birthdate);
     }
-    if(age_months<0) {
-        age_months += 12;
-        age_years--;
+    htmlCode += '<tr><td>Age (total days)</td><td>'+age.totdays+'</td></tr>';
+    htmlCode += '<tr><td>Age</td><td>'+age.years+' years, '+age.months+' months</td></tr>';
+    if(!isMine) {
+        htmlCode += '<tr><td>Mother name</td><td>'+babyList[babyId].motherName+'</td></tr>';
+        htmlCode += '<tr><td>Mother surname</td><td>'+babyList[babyId].motherSurname+'</td></tr>';
+        age = getAge(babyList[babyId].motherBirthdate);
+        htmlCode += '<tr><td>Mother age</td><td>'+age.years+' years, '+age.months+' months</td></tr>';
     }
-    htmlCode += 'Age (total days): '+age_totdays+'<br>';
-    htmlCode += 'Age : '+age_years+' years, '+age_months+' months<br>';
+    htmlCode += '</table>';
     htmlCode += '<br><br>';
     htmlCode += '<div id=\''+tabInnerTabs+'\'></div>';
     htmlCode += '<div id=\''+tabInnerGraphs+'\'></div>';
     htmlCode += '<br><br>';
-    htmlCode += '<input type=\'button\' value=\'Remove\' id=\''+tabRB+'\'><br>';
+    htmlCode += '<input type=\'button\' value=\'Remove\' class=\'buttonGeneric\' id=\''+tabRB+'\'><br>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
     $('#'+tabId).hide();
@@ -303,10 +290,11 @@ function addBabyTab(tabName, isMine, babyId) {
     (function(ln, tn) {
         $('#'+ln).click(function() {showTemp(tn)});
     })(tabSTB, tabId);
+*/
     (function(ln, tn) {
         $('#'+ln).click(function() {removeTab(tn)});
     })(tabRB, tabId);
-*/
+
     //Baby page inner tab links
     var babyTabIds = new Array();
     for(var i=0; i<babyInnerTabList.length; i++) {
@@ -336,9 +324,12 @@ function addBabyTab(tabName, isMine, babyId) {
         htmlCode = '';
         htmlCode += '<div id=\''+babyTabIds[i].tabId+'\'>';
         htmlCode += 'Showing baby '+babyInnerTabList[i].displayName;
+        htmlCode += '<div id=\''+babyTabIds[i].tabId+'Graph\'>';
+        htmlCode += '</div>';
         htmlCode += '</div>';
         $('#'+tabInnerGraphs).append(htmlCode);
         $('#'+babyTabIds[i].tabId).hide();
+        displayGraph(babyTabIds[i].tabId+'Graph', babyInnerTabList[i].type);
     }
 
     //Add to tab list
@@ -364,14 +355,14 @@ function addBabyTab(tabName, isMine, babyId) {
     } 
 }
 
-
+/*
 function displayBabyInnerTab(ln, tn, type, graphId) {
     $('.buttonInnerTabSelected').removeClass('buttonInnerTabSelected').addClass('buttonInnerTab');
     $('#'+ln).removeClass('buttonInnerTab').addClass('buttonInnerTabSelected');
     //TODO Handle graph display
     displayGraph(graphId, type);
 }
-
+*/
 
 function refreshTabLinks() {
     //alert('refreshTabLinks - 01');
@@ -508,6 +499,7 @@ function askMomInfo() {
     var htmlCode = '';
     htmlCode += 'Please, insert your informations<br><br>';
     htmlCode += 'Mother name: <input type=\'text\' id=\'momMotherName\'><br>';
+    htmlCode += 'Mother surname: <input type=\'text\' id=\'momMotherSurname\'><br>';
     htmlCode += 'Mother birthdate: <input type=\'date\' id=\'momMotherDate\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMomInfo()\'>';
     $('#dialog-content').html(htmlCode);
@@ -519,6 +511,7 @@ function saveMomInfo() {
     //alert('saveMomInfo');
     momInfo = {};
     momInfo.name = $('#momMotherName').val();
+    momInfo.surname = $('#momMotherSurname').val();
     momInfo.birthdate = new Date($('#momMotherDate').val());
     //TODO check that input values are valid
     storeMomInfo(momInfo);
@@ -534,21 +527,26 @@ function addMomTabs() {
 
     $('#target').html('');
 
+    var age = getAge(momInfo.birthdate);
     var htmlCode = '';
     htmlCode += '<div id=\'momTab\'>';
-    htmlCode += 'My name: '+momInfo.name+'<br>';
-    htmlCode += 'My birthdate: '+momInfo.birthdate.toDateString()+'<br>';
+    htmlCode += '<table>';
+    htmlCode += '<tr><td>My name</td><td>'+momInfo.name+'</td></tr>';
+    htmlCode += '<tr><td>My surname</td><td>'+momInfo.surname+'</td></tr>';
+    htmlCode += '<tr><td>My birthdate</td><td>'+momInfo.birthdate.toDateString()+'</td></tr>';
+    htmlCode += '<tr><td>My age</td><td>'+age.years+' years, '+age.months+' months</td></tr>';
+    htmlCode += '</table>';
     htmlCode += '<br><br>';
     htmlCode += '<div id=\'momInnerTabs\'>';
     htmlCode += '</div>';
     htmlCode += '<div id=\'momInnerGraphs\'>';
     htmlCode += '</div>';
     htmlCode += '<br><br>';
-    htmlCode += '<input type=\'button\' value=\'Add my baby\' onclick=\'addMyBaby()\'>';
+    htmlCode += '<input type=\'button\' value=\'Add my baby\' class=\'buttonGeneric\' onclick=\'addMyBaby()\'>';
     htmlCode += '<div id=\'addMyBaby\'>';
     htmlCode += '</div>';
     htmlCode += '<br><br>';
-    htmlCode += '<input type=\'button\' value=\'Change my info\' onclick=\'askMomInfo()\'>';
+    htmlCode += '<input type=\'button\' value=\'Change my info\' class=\'buttonGeneric\' onclick=\'askMomInfo()\'>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
 
@@ -577,9 +575,12 @@ function addMomTabs() {
         htmlCode = '';
         htmlCode += '<div id=\''+momInnerTabList[i].tabId+'\'>';
         htmlCode += 'Showing mom '+momInnerTabList[i].displayName;
+        htmlCode += '<div id=\''+momInnerTabList[i].tabId+'Graph\'>';
+        htmlCode += '</div>';
         htmlCode += '</div>';
         $('#momInnerGraphs').append(htmlCode);
         $('#'+momInnerTabList[i].tabId).hide();
+        displayGraph(momInnerTabList[i].tabId+'Graph', momInnerTabList[i].type);
     }
 
     var tabElement = {};
@@ -609,7 +610,7 @@ function addMidwifeTabs() {
     var htmlCode = '';
     htmlCode += '<div id=\'midwifeTab\'>';
     htmlCode += 'midwife info<br>';
-    htmlCode += '<input type=\'button\' value=\'Connect new baby\' onclick=\'connectNewBaby()\'>';
+    htmlCode += '<input type=\'button\' value=\'Connect new baby\' class=\'buttonGeneric\' onclick=\'connectNewBaby()\'>';
     htmlCode += '<div id=\'connectNewBaby\'>';
     htmlCode += '</div>';
     htmlCode += '<br><br>';
@@ -624,7 +625,7 @@ function addMidwifeTabs() {
     tabList.push(tabElement);
 
     for(var i=0; i<babyList.length; i++) {
-        addBabyTab(babyList[i].name, false, i);
+        addBabyTab(babyList[i].name+' '+babyList[i].surname, false, i);
     }
 }
 
@@ -706,6 +707,27 @@ function displayTab(tabId, allTabs, tabSelectedClass, tabUnselectedClass) {
     }
     $('#'+tabId).show();
     $('#'+tabId+'Link').removeClass(tabUnselectedClass).addClass(tabSelectedClass);
+}
+
+
+function getAge(birthdate) {
+    var today = new Date();
+    var result = {};
+    var age_ms = today - birthdate;
+    result.totdays = Math.floor(age_ms/(1000*3600*24));
+    var age_days = today.getDate() - birthdate.getDate();
+    var age_months = today.getMonth() - birthdate.getMonth();
+    var age_years = today.getFullYear() - birthdate.getFullYear();
+    if(age_days<0) {
+        age_months --;
+    }
+    if(age_months<0) {
+        age_months += 12;
+        age_years--;
+    }
+    result.months = age_months;
+    result.years = age_years;
+    return result;
 }
 
 

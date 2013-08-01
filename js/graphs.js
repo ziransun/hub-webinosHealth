@@ -11,19 +11,19 @@ function displayGraph(divName, type) {
     //alert('displayGraph - div is '+divName+', type is '+type);
     var htmlCode = '';
     if(type == 0) {
-        htmlCode += '<br>Showing mom blood pressure';
+        htmlCode += '<br>Div for showing graph with mom blood pressure';
     }
     else if(type == 1) {
-        htmlCode += '<br>Showing mom blood sugar';
+        htmlCode += '<br>Div for showing graph with mom blood sugar';
     }
     else if(type == 2) {
-        htmlCode += '<br>Showing mom heartrate';
+        htmlCode += '<br>Div for showing graph with mom heartrate';
     }
     else if(type == 10) {
-        htmlCode += '<br>Showing baby weight';
+        htmlCode += '<br>Div for showing graph with baby weight';
     }
     else if(type == 11) {
-        htmlCode += '<br>Showing baby temperature';
+        htmlCode += '<br>Div for showing graph with baby temperature';
     }
     $('#'+divName).html(htmlCode);
 }

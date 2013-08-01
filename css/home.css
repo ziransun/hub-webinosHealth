@@ -188,3 +188,10 @@ th {
 }
 
 
+/* css for generic buttons */
+.buttonGeneric {
+    background: #adff00;
+    color: #000000;
+}
+
+
