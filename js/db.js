@@ -60,6 +60,7 @@ function queryMomInfo(cbk) {
     var result = null;
     serviceList = new Array();
 
+/*
     try {
     webinos.discovery.findServices(
         //new ServiceType("http://webinos.org/api/*"),
@@ -78,42 +79,55 @@ function queryMomInfo(cbk) {
     catch(e) {
         alert('error in find services');
     }
+*/
 
     result = {};
     result.name = 'Nicole';
-    result.surname = 'Kidman';
-    result.birthdate = new Date(67, 5, 20);
+    result.surname = 'Letterman';
+    result.birthdate = new Date(77, 11, 14);
 
     cbk(result);
     //return result;
 }
 
 
-function storeMomInfo(momInfo) {
+function storeData(index, sensorType, timestamp, sensorValues) {
+    //TODO Store acquired data in the correct db
+    //alert('Storing data for baby '+index+' and sensor '+sensorType+': '+timestamp.toDateString()+' - '+sensorValues[0]);
 }
 
 
-function queryBabyWeight(baby_name) {
-}
+function retrieveData(index, sensorType) {
+    var result = {};
+    result.timestamp = new Array();
+    result.values = new Array();
 
+    //TODO Should query db to retrieve data
+    
+    //Generating some random values for test
+    var rndYear = 2012-Math.floor(Math.random()*2);
+    var rndMonth = Math.floor(Math.random()*12)+1;
+    var rndDay = Math.floor(Math.random()*28)+1;
+    var rndVal = Math.floor(Math.random()*20)+20;
+    var incDay, incVal;
+    for(var i=0; i<10; i++) {
+        incDay = Math.floor(Math.random()*7)+1;
+        incVal = Math.floor(Math.random()*5)-2;
+        rndDay += incDay;
+        if(rndDay > 28) {
+            rndDay -= 28;
+            rndMonth += 1;
+            if(rndMonth > 12) {
+                rndMonth -= 12;
+                rndYear += 1;
+            }
+        }
+        rndVal += incVal;
+        result.timestamp.push(new Date(rndYear, rndMonth, rndDay));
+        result.values.push(rndVal);
+    }
 
-function queryBabyWeighthistory(baby_name, starting_time, end_time) {
-}
-
-
-function queryMyBabyWeight(baby_name) {
-}
-
-
-function queryMyBabyWeighthistory(baby_name, starting_time, end_time) {
-}
-
-
-function queryMomHR(mom_name) {
-}
-
-
-function queryMomHRHistory(mom_name, starting_time, end_time) {
+    return result;
 }
 
 
