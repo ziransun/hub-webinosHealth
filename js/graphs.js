@@ -142,8 +142,10 @@ function graphHandler() {
         htmlCode += 'Showing data for '+this.description+'<br><br>';
         htmlCode += 'Start date: <input type=\'date\' id=\'graphStartDate\'><br>';
         htmlCode += 'End date: <input type=\'date\' id=\'graphEndDate\'><br>';
-        htmlCode += 'View type: <br>';
-        htmlCode += '<br>';
+        htmlCode += 'View type: <select id=\'graphViewType\'>';
+        htmlCode += '<option value=\'0\'>Table</option>';
+        htmlCode += '<option value=\'1\'>Graph</option>';
+        htmlCode += '</select><br>';
         htmlCode += '<div id=\'dialog-content-graph\'></div>';
         $('#dialog-content').html(htmlCode);
         $('#dialog-container').fadeIn(1000);
@@ -158,20 +160,44 @@ function graphHandler() {
                 rf.showGraph();
             });
         })(this);
+        (function(rf) {
+            $('#graphViewType').change(function() {
+                rf.showGraph();
+            });
+        })(this);
     }
 
 
     graphHandler.prototype.showGraph = function() {
         var startDate = new Date($('#graphStartDate').val());
         var endDate = new Date($('#graphEndDate').val());
+        var viewType = $('#graphViewType').val();
         var data = graphFilter(this.historicData, startDate, endDate);
         var htmlCode = '';
-        htmlCode += '<table><tr><td>Date</td><td>Value</td></tr>';
-        for(var i=0; i<data.timestamp.length; i++) {
-            htmlCode += '<tr><td>'+data.timestamp[i].toDateString()+'</td><td>'+data.values[i]+'</td></tr>';
+        if(viewType == 0) {
+            htmlCode += '<table><tr><td>Date</td><td>Value</td></tr>';
+            for(var i=0; i<data.timestamp.length; i++) {
+                htmlCode += '<tr><td>'+data.timestamp[i].toDateString()+'</td><td>'+data.values[i]+'</td></tr>';
+            }
+            htmlCode += '</table>';
+            $('#dialog-content-graph').html(htmlCode);
         }
-        htmlCode += '</table>';
-        $('#dialog-content-graph').html(htmlCode);
+        else if(viewType == 1) {
+            var cdiv = $('#dialog-content-graph').get(0);
+            var chart = new google.visualization.LineChart(cdiv);
+            var go = {};
+            var gd = new google.visualization.DataTable();
+            gd.addColumn('date', 'Date');
+            gd.addColumn('number', 'Value');
+            for(var i=0; i<data.timestamp.length; i++) {
+                gd.addRow([data.timestamp[i], data.values[i]]);
+            }
+            chart.draw(gd, go);
+        }
+        else {
+            htmlCode += '<br>Sorry, not supported';
+            $('#dialog-content-graph').html(htmlCode);
+        }
     }
 
 }

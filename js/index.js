@@ -1,3 +1,4 @@
+
 var myBabyCount = 0;
 var otherBabyCount = 0;
 var momInfo = null;
@@ -20,11 +21,16 @@ var babyList = new Array();    //Midwife
 var mybabyList = new Array();    //Mom
 
 
-$(document).ready(function() {
-/*
- * Request user to choose profile category in the option list:   0-mom; 1-mybaby; 2-midwife
- * Once profile is selected, left column updated as per profile
- */
+try {
+    google.load('visualization', '1', {'packages': ['corechart'], 'callback': gl});
+}
+catch(e) {
+    alert('google load error: '+e.message);
+    gl();
+}
+
+
+function gl() {
     init();
     addProfileTab();
     addListener();
@@ -33,7 +39,7 @@ $(document).ready(function() {
         $('#dialog-container').fadeOut();
     });
 
-});
+}
 
 
 function init() {
