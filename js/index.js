@@ -138,7 +138,7 @@ function addBabyTab(tabName, isMine, babyId) {
     var htmlCode = '';
     var age;
     htmlCode += '<div id=\''+tabId+'\'>';
-    htmlCode += '<table>';
+    htmlCode += '<br><table>';
     if(isMine) {
         htmlCode += '<tr><td>Name</td><td>'+mybabyList[babyId].name+'</td></tr>';
         htmlCode += '<tr><td>Surname</td><td>'+mybabyList[babyId].surname+'</td></tr>';
@@ -154,6 +154,7 @@ function addBabyTab(tabName, isMine, babyId) {
     htmlCode += '<tr><td>Age (total days)</td><td>'+age.totdays+'</td></tr>';
     htmlCode += '<tr><td>Age</td><td>'+age.years+' years, '+age.months+' months</td></tr>';
     if(!isMine) {
+        htmlCode += '<tr><td><br></td></tr>';
         htmlCode += '<tr><td>Mother name</td><td>'+babyList[babyId].motherName+'</td></tr>';
         htmlCode += '<tr><td>Mother surname</td><td>'+babyList[babyId].motherSurname+'</td></tr>';
         age = getAge(babyList[babyId].motherBirthdate);
@@ -208,7 +209,7 @@ function addBabyTab(tabName, isMine, babyId) {
         $('#'+tabInnerGraphs).append(htmlCode);
         $('#'+babyTabIds[i].tabId).hide();
         var gh = new graphHandler();
-        gh.displayGraph(babyTabIds[i].tabId+'Graph', babyInnerTabList[i].type, babyId);
+        gh.displayGraph(babyTabIds[i].tabId+'Graph', babyInnerTabList[i].type, babyId, isMine);
     }
 
     //Add to tab list
@@ -440,7 +441,7 @@ function addMomTabs() {
         $('#momInnerGraphs').append(htmlCode);
         $('#'+momInnerTabList[i].tabId).hide();
         var gh = new graphHandler();
-        gh.displayGraph(momInnerTabList[i].tabId+'Graph', momInnerTabList[i].type, -1);
+        gh.displayGraph(momInnerTabList[i].tabId+'Graph', momInnerTabList[i].type, -1, true);
     }
 
     var tabElement = {};
