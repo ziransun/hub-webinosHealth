@@ -97,18 +97,26 @@ function graphHandler() {
 
     graphHandler.prototype.dataAcquisition = function () {
         var htmlCode = '';
-        //htmlCode += 'Sorry, no sensors available...';
+        htmlCode += 'Select sensor from explorer...';
         $('#dialog-content').html(htmlCode);
         $('#dialog-container').fadeIn(1000);
+        this.sensors4Choice = null;
+        this.sensorSelected = -1;
+        (function(rf) {
         webinos.dashboard
             .open({
-                module: 'explorer',
-                data: { service: this.serviceUri }
-            }, function(){ } )
+                    module: 'explorer',
+                    data: { service: rf.serviceUri }
+                }, function(){
+                    if(rf.sensorSelected == -1) {
+                        $('#dialog-content').html('No sensor selected...');
+                    }
+            })
             .onAction(function (data) {
                 //alert(JSON.stringify(data));
-                selectServiceStatic(data.result, ref);
+                selectServiceStatic(data.result, rf);
             });
+        })(this);
     }
 
 
