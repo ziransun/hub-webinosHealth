@@ -358,11 +358,21 @@ function checkMomInfo() {
 
 
 function askMomInfo() {
+    var bDay = momInfo.birthdate.getDate();
+    var bMonth = momInfo.birthdate.getMonth()+1;
+    var bYear = momInfo.birthdate.getFullYear();
+    if(bDay < 10) {
+        bDay = '0'+bDay;
+    }
+    if(bMonth < 10) {
+        bMonth = '0'+bMonth;
+    }
+    var bString = bYear+'-'+bMonth+'-'+bDay;
     var htmlCode = '';
     htmlCode += 'Please, insert your informations<br><br>';
-    htmlCode += 'Mother name: <input type=\'text\' id=\'momMotherName\'><br>';
-    htmlCode += 'Mother surname: <input type=\'text\' id=\'momMotherSurname\'><br>';
-    htmlCode += 'Mother birthdate: <input type=\'date\' id=\'momMotherDate\'><br>';
+    htmlCode += 'Mother name: <input type=\'text\' id=\'momMotherName\' value=\''+momInfo.name+'\'><br>';
+    htmlCode += 'Mother surname: <input type=\'text\' id=\'momMotherSurname\' value=\''+momInfo.surname+'\'><br>';
+    htmlCode += 'Mother birthdate: <input type=\'date\' id=\'momMotherDate\' value=\''+bString+'\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMomInfo()\'>';
     $('#dialog-content').html(htmlCode);
     $('#dialog-container').fadeIn(1000);
