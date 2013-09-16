@@ -208,11 +208,13 @@ function addBabyTab(tabName, isMine, babyId) {
     htmlCode = '';
     htmlCode += '<table><tr>';
     $('#'+tabInnerTabs).html(htmlCode);
+    var colWidPer = 100/babyInnerTabList.length;
     for(var i=0; i<babyInnerTabList.length; i++) {
         var BITlink = babyTabIds[i].tabId+'Link';
         htmlCode = '';
-        htmlCode += '<td>';
-        htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<td width='+colWidPer+'%>';
+        //htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<div id=\''+BITlink+'\' class=\'buttonInnerTab\'>'+babyInnerTabList[i].displayName+'</div>';
         htmlCode += '</td>';
         $('#'+tabInnerTabs).append(htmlCode);
         (function(ln, tn, tabList) {
@@ -314,11 +316,13 @@ function updateBabyTab(tabName, isMine, babyId) {
     htmlCode = '';
     htmlCode += '<table><tr>';
     $('#'+tabInnerTabs).html(htmlCode);
+    var colWidPer = 100/babyInnerTabList.length;
     for(var i=0; i<babyInnerTabList.length; i++) {
         var BITlink = babyTabIds[i].tabId+'Link';
         htmlCode = '';
-        htmlCode += '<td>';
-        htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<td width='+colWidPer+'%>';
+        //htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<div id=\''+BITlink+'\' class=\'buttonInnerTab\'>'+babyInnerTabList[i].displayName+'</div>';
         htmlCode += '</td>';
         $('#'+tabInnerTabs).append(htmlCode);
         (function(ln, tn, tabList) {
@@ -345,7 +349,7 @@ function updateBabyTab(tabName, isMine, babyId) {
 
 function refreshTabLinks() {
     //alert('refreshTabLinks - 01');
-    $('#leftcolumn').html('<table>');
+    $('#leftcolumn').html('<br><table>');
     var prevType = tabList[0].type;
     for(var i=0; i<tabList.length; i++) {
         var tabId = tabList[i].tabId;
@@ -363,14 +367,15 @@ function refreshTabLinks() {
             }
             prevType = tabList[i].type;
         }
-        htmlCode += '<tr><td><input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\' class=\'buttonTab\'></td></tr>';
+        //htmlCode += '<tr><td><input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\' class=\'buttonTab\'></td></tr>';
+        htmlCode += '<tr><td id=\''+link+'\' class=\'buttonTab\'>'+tabList[i].displayName+'</td></tr>';
         $('#leftcolumn').append(htmlCode);
         (function(ln, tn) {
             //$('#'+ln).click(function() {displayTab(tn)});
             $('#'+ln).click(function() {displayTab(tn, tabList, 'buttonTabSelected', 'buttonTab')});
         })(link, tabId);
     }
-    $('#leftcolumn').append('</table>');
+    $('#leftcolumn').append('</table><br>');
 }
 
 
@@ -409,8 +414,7 @@ function addProfileTab() {
     htmlCode += '</td>';
     htmlCode += '</tr>';
     
-    //add enrol button - to enroll with health Hub
-    $('#rightcolumn').append(htmlCode);
+    $('#rightcolumn').html(htmlCode);
 }
 
 
@@ -543,12 +547,14 @@ function addMomTabs() {
     htmlCode = '';
     htmlCode += '<table><tr>';
     $('#momInnerTabs').html(htmlCode);
+    var colWidPer = 100/momInnerTabList.length;
     for(var i=0; i<momInnerTabList.length; i++) {
         var tabId = momInnerTabList[i].tabId;
         var link = tabId+'Link';
         htmlCode = '';
-        htmlCode += '<td>';
-        htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<td width='+colWidPer+'%>';
+        //htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'><br>';
+        htmlCode += '<div value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'>'+momInnerTabList[i].displayName+'</div>';
         htmlCode += '</td>';
         $('#momInnerTabs').append(htmlCode);
         (function(ln, tn, tabList) {
