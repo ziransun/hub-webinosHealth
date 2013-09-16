@@ -88,12 +88,35 @@ function getOtherBabies(cbk) {
 
 
 function addMyBabyInfo(index) {
+    var defName;
+    var defSurname;
+    var defBirthdate;
+    if(index != -1) {
+        if(mybabyList[index].name) {
+            defName = mybabyList[index].name;
+        }
+        if(mybabyList[index].surname) {
+            defSurname = mybabyList[index].surname;
+        }
+        if(mybabyList[index].birthdate) {
+            var bDay = mybabyList[index].birthdate.getDate();
+            var bMonth = mybabyList[index].birthdate.getMonth()+1;
+            var bYear = mybabyList[index].birthdate.getFullYear();
+            if(bDay < 10) {
+                bDay = '0'+bDay;
+            }
+            if(bMonth < 10) {
+                bMonth = '0'+bMonth;
+            }
+            defBirthdate = bYear+'-'+bMonth+'-'+bDay;
+        }
+    }
     var htmlCode = '';
-    htmlCode += '<br><br>Add my new baby<br>';
-    htmlCode += 'Name: <input type=\'text\' id=\'myBabyName\'><br>';
-    htmlCode += 'Surname: <input type=\'text\' id=\'myBabySurname\'><br>';
+    htmlCode += '<br><br>My baby info<br>';
+    htmlCode += 'Name: <input type=\'text\' id=\'myBabyName\' value=\''+defName+'\'><br>';
+    htmlCode += 'Surname: <input type=\'text\' id=\'myBabySurname\' value=\''+defSurname+'\'><br>';
     //TODO the input type date is supported by Chrome but not by Firefox
-    htmlCode += 'Birthdate: <input type=\'date\' id=\'myBabyDate\'><br>';
+    htmlCode += 'Birthdate: <input type=\'date\' id=\'myBabyDate\' value=\''+defBirthdate+'\'><br>';
     htmlCode += '<input type=\'button\' value=\'Save\' onclick=\'saveMyBaby('+index+')\'>';
     $('#dialog-content').html(htmlCode);
     $('#dialog-container').fadeIn(1000);
