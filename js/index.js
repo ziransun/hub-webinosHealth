@@ -23,6 +23,7 @@ var mybabyList = new Array();    //Mom
 
 try {
     google.load('visualization', '1', {'packages': ['corechart'], 'callback': gl});
+    //gl();
 }
 catch(e) {
     alert('google load error: '+e.message);
@@ -375,6 +376,7 @@ function updateBabyTab(tabName, isMine, babyId) {
 function refreshTabLinks() {
     //alert('refreshTabLinks - 01');
     $('#leftcolumn').html('<br><table>');
+    var colWid = '240px';
     var prevType = tabList[0].type;
     for(var i=0; i<tabList.length; i++) {
         var tabId = tabList[i].tabId;
@@ -382,18 +384,18 @@ function refreshTabLinks() {
         var htmlCode = '';
         if(prevType != tabList[i].type) {
             if(prevType == 0) {
-                htmlCode += '<tr><td>My babies</td></tr>';
+                htmlCode += '<tr><td width='+colWid+'>My babies</td></tr>';
             }
             else if(prevType == 2) {
-                htmlCode += '<tr><td>Babies</td></tr>';
+                htmlCode += '<tr><td width='+colWid+'>Babies</td></tr>';
             }
             else {
-                htmlCode += '<tr><td></td></tr>';
+                htmlCode += '<tr><td width='+colWid+'></td></tr>';
             }
             prevType = tabList[i].type;
         }
         //htmlCode += '<tr><td><input type=\'button\' value=\''+tabList[i].displayName+'\' id=\''+link+'\' class=\'buttonTab\'></td></tr>';
-        htmlCode += '<tr><td id=\''+link+'\' class=\'buttonTab\'>'+tabList[i].displayName+'</td></tr>';
+        htmlCode += '<tr><td width='+colWid+' id=\''+link+'\' class=\'buttonTab\'>'+tabList[i].displayName+'</td></tr>';
         $('#leftcolumn').append(htmlCode);
         (function(ln, tn) {
             //$('#'+ln).click(function() {displayTab(tn)});
