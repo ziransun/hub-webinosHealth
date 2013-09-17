@@ -234,7 +234,25 @@ td {
     padding-left: 10px;
 }
 
-a {
-    text-decoration: none;
+.tabTable {
+    margin-left: auto;
+    margin-right: auto;
 }
+
+.tabTableTr {
+}
+
+.tabTableTd {
+    background: #202020;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    text-align: center;
+}
+
+.centerDiv {
+    text-align: center;
+}
+
 

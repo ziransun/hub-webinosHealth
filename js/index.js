@@ -200,15 +200,15 @@ function addBabyTab(tabName, isMine, babyId) {
     }
     htmlCode += '</table>';
     htmlCode += '<br><br>';
-    htmlCode += '<div id=\''+tabInnerTabs+'\'></div>';
-    htmlCode += '<div id=\''+tabInnerGraphs+'\'></div>';
-    htmlCode += '<br><br>';
     htmlCode += '<table>';
     if(isMine) {
         htmlCode += '<tr><td><input type=\'button\' value=\'Change baby info\' class=\'buttonGeneric\' id=\''+tabCI+'\'></td></tr>';
     }
     htmlCode += '<tr><td><input type=\'button\' value=\'Remove\' class=\'buttonGeneric\' id=\''+tabRB+'\'></td></tr>';
     htmlCode += '</table>';
+    htmlCode += '<br><br>';
+    htmlCode += '<div id=\''+tabInnerTabs+'\'></div>';
+    htmlCode += '<div id=\''+tabInnerGraphs+'\'></div>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
     $('#'+tabId).hide();
@@ -229,13 +229,15 @@ function addBabyTab(tabName, isMine, babyId) {
         babyTabIds[i].tabId = BITtabId;
     }
     htmlCode = '';
-    htmlCode += '<table><tr>';
+    htmlCode += '<div class=\'centerDiv\'><table class=\'tabTable\'><tr>';
     $('#'+tabInnerTabs).html(htmlCode);
     var colWidPer = 100/babyInnerTabList.length;
+    var colWidPx = 300/babyInnerTabList.length;
     for(var i=0; i<babyInnerTabList.length; i++) {
         var BITlink = babyTabIds[i].tabId+'Link';
         htmlCode = '';
-        htmlCode += '<td width='+colWidPer+'%>';
+        //htmlCode += '<td width='+colWidPer+'% class=\'tabTableTd\'>';
+        htmlCode += '<td width='+colWidPx+'px class=\'tabTableTd\'>';
         //htmlCode += '<input type=\'button\' value=\''+babyInnerTabList[i].displayName+'\' id=\''+BITlink+'\' class=\'buttonInnerTab\'><br>';
         htmlCode += '<div id=\''+BITlink+'\' class=\'buttonInnerTab\'>'+babyInnerTabList[i].displayName+'</div>';
         htmlCode += '</td>';
@@ -244,7 +246,7 @@ function addBabyTab(tabName, isMine, babyId) {
             $('#'+ln).click(function() {displayTab(tn, tabList, 'buttonInnerTabSelected', 'buttonInnerTab')});
         })(BITlink, babyTabIds[i].tabId, babyTabIds);
     }
-    htmlCode = '</tr></table>';
+    htmlCode = '</tr></table></div>';
     $('#'+tabInnerTabs).append(htmlCode);
 
     //Baby page inner tabs
@@ -554,28 +556,30 @@ function addMomTabs() {
     htmlCode += '<tr><td>My age</td><td>'+age.years+' years, '+age.months+' months</td></tr>';
     htmlCode += '</table>';
     htmlCode += '<br><br>';
-    htmlCode += '<div id=\'momInnerTabs\'>';
-    htmlCode += '</div>';
-    htmlCode += '<div id=\'momInnerGraphs\'>';
-    htmlCode += '</div>';
-    htmlCode += '<br><br>';
     htmlCode += '<table>';
     htmlCode += '<tr><td><input type=\'button\' value=\'Add my baby\' class=\'buttonGeneric\' onclick=\'addMyBabyInfo(-1)\'></td>';
     htmlCode += '<td><input type=\'button\' value=\'Change my info\' class=\'buttonGeneric\' onclick=\'askMomInfo()\'></td></tr>';
     htmlCode += '</table>';
+    htmlCode += '<br><br>';
+    htmlCode += '<div id=\'momInnerTabs\'>';
+    htmlCode += '</div>';
+    htmlCode += '<div id=\'momInnerGraphs\'>';
+    htmlCode += '</div>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
 
     //Mom page inner tab links
     htmlCode = '';
-    htmlCode += '<table><tr>';
+    htmlCode += '<table class=\'tabTable\'><tr class=\'tabTableTr\'>';
     $('#momInnerTabs').html(htmlCode);
     var colWidPer = 100/momInnerTabList.length;
+    var colWidPx = 450/momInnerTabList.length;
     for(var i=0; i<momInnerTabList.length; i++) {
         var tabId = momInnerTabList[i].tabId;
         var link = tabId+'Link';
         htmlCode = '';
-        htmlCode += '<td width='+colWidPer+'%>';
+        //htmlCode += '<td width='+colWidPer+'% class=\'tabTableTd\'>';
+        htmlCode += '<td width='+colWidPx+'px class=\'tabTableTd\'>';
         //htmlCode += '<input type=\'button\' value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'><br>';
         htmlCode += '<div value=\''+momInnerTabList[i].displayName+'\' id=\''+link+'\' class=\'buttonInnerTab\'>'+momInnerTabList[i].displayName+'</div>';
         htmlCode += '</td>';
