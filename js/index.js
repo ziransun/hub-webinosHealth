@@ -3,7 +3,7 @@ var myBabyCount = 0;
 var otherBabyCount = 0;
 var momInfo = null;
 
-var tmptmp = new Array();
+var googleAvailable;
 
 // tabList is an array of objects including the following attributes:
 // -tabId: it's the id of the tab
@@ -22,16 +22,23 @@ var mybabyList = new Array();    //Mom
 
 
 try {
-    google.load('visualization', '1', {'packages': ['corechart'], 'callback': gl});
-    //gl();
+    googleAvailable = false;
+    setTimeout('gl()', 100);
+    google.load('visualization', '1', {'packages': ['corechart'], 'callback': googleLoaded});
 }
 catch(e) {
     alert('google load error: '+e.message);
-    gl();
+    //gl();
+}
+
+
+function googleLoaded() {
+    googleAvailable = true;
 }
 
 
 function gl() {
+    loadingGoogle = false;
     init();
     addProfileTab();
     addListener();
@@ -39,7 +46,6 @@ function gl() {
     $('#close').click(function() {
         $('#dialog-container').fadeOut();
     });
-
 }
 
 
