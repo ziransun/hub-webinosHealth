@@ -34,32 +34,32 @@ function graphHandler() {
         if(type == 0) {
             htmlCode += '<tr><td>Div for showing graph with mom blood pressure</td></tr>';
             this.description = 'mom blood pressure';
-            this.serviceUri = 'http://webinos.org/api/sensors.bloodpressure';
+            this.serviceUri = 'http://webinos.org/api/sensors/bloodpressure';
         }
         else if(type == 1) {
             htmlCode += '<tr><td>Div for showing graph with mom blood sugar</td></tr>';
             this.description = 'mom blood sugar';
-            this.serviceUri = 'http://webinos.org/api/sensors.bloodsugar';
+            this.serviceUri = 'http://webinos.org/api/sensors/bloodsugar';
         }
         else if(type == 2) {
             htmlCode += '<tr><td>Div for showing graph with mom heartrate</td></tr>';
             this.description = 'mom heartrate';
-            this.serviceUri = 'http://webinos.org/api/sensors.heartratemonitor';
+            this.serviceUri = 'http://webinos.org/api/sensors/heartratemonitor';
         }
         else if(type == 3) {
             htmlCode += '<tr><td>Div for showing graph with mom temperature</td></tr>';
             this.description = 'mom temperature';
-            this.serviceUri = 'http://webinos.org/api/sensors.temperature';
+            this.serviceUri = 'http://webinos.org/api/sensors/temperature';
         }
         else if(type == 10) {
             htmlCode += '<tr><td>Div for showing graph with baby weight</td></tr>';
             this.description = 'baby weight';
-            this.serviceUri = 'http://webinos.org/api/sensors.weightscale';
+            this.serviceUri = 'http://webinos.org/api/sensors/weightscale';
         }
         else if(type == 11) {
             htmlCode += '<tr><td>Div for showing graph with baby temperature</td></tr>';
             this.description = 'baby temperature';
-            this.serviceUri = 'http://webinos.org/api/sensors.temperature';
+            this.serviceUri = 'http://webinos.org/api/sensors/temperature';
         }
         htmlCode += '<tr><td><input type=\'button\' value=\'Show data\' class=\'buttonGeneric\' id=\''+this.mainDiv+'ShowButton\'></td></tr>';
         if(showAcquire) {
@@ -103,18 +103,18 @@ function graphHandler() {
         this.sensors4Choice = null;
         this.sensorSelected = -1;
         (function(rf) {
+        var serviceList = [ rf.serviceUri ];
         webinos.dashboard
             .open({
                     module: 'explorer',
-                    data: { service: rf.serviceUri }
+                    data: { service: serviceList }
                 }, function(){
                     if(rf.sensorSelected == -1) {
                         $('#dialog-content').html('No sensor selected...');
                     }
             })
             .onAction(function (data) {
-                //alert(JSON.stringify(data));
-                selectServiceStatic(data.result, rf);
+                selectServiceStatic(data.result[0], rf);
             });
         })(this);
     }
