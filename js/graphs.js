@@ -12,6 +12,8 @@ function graphHandler() {
     this.sensorSelected;
     this.description = null;
     this.historicData = null;
+    this.acquisitionInProgress = false;
+    this.acquisitionMode = -1;
 
     /* type is the type of data to be shown in graph:
        -0 = mom blood pressure
@@ -96,33 +98,47 @@ function graphHandler() {
 
 
     graphHandler.prototype.dataAcquisition = function () {
-        var htmlCode = '';
-        htmlCode += 'Select sensor from explorer...';
-        $('#dialog-content').html(htmlCode);
-        $('#dialog-container').fadeIn(1000);
-        this.sensors4Choice = null;
-        this.sensorSelected = -1;
-        (function(rf) {
-        var serviceList = [ rf.serviceUri ];
-        webinos.dashboard
-            .open({
-                    module: 'explorer',
-                    data: { service: serviceList }
-                }, function(){
-                    if(rf.sensorSelected == -1) {
-                        $('#dialog-content').html('No sensor selected...');
-                    }
-            })
-            .onAction(function (data) {
-                selectServiceStatic(data.result[0], rf);
-            });
-        })(this);
+        if(this.acquisitionInProgress) {
+            var htmlCode = '';
+            htmlCode += 'Acquisition in progress...<br>';
+            htmlCode += '<input type=\'button\' value=\'Stop acquisition\' class=\'buttonGeneric\' id=\''+this.mainDiv+'SA\'>';
+            $('#dialog-content').html(htmlCode);
+            $('#dialog-container').fadeIn(1000);
+            (function(mDiv, rf) {
+                $('#'+mDiv+'SA').click(function() {
+                    stopDataAcquisition(rf);
+                });
+            })(this.mainDiv, this);
+        }
+        else {
+            var htmlCode = '';
+            htmlCode += 'Select sensor from explorer...';
+            $('#dialog-content').html(htmlCode);
+            $('#dialog-container').fadeIn(1000);
+            this.sensors4Choice = null;
+            this.sensorSelected = -1;
+            (function(rf) {
+            var serviceList = [ rf.serviceUri ];
+            webinos.dashboard
+                .open({
+                        module: 'explorer',
+                        data: { service: serviceList }
+                    }, function(){
+                        if(rf.sensorSelected == -1) {
+                            $('#dialog-content').html('No sensor selected...');
+                        }
+                })
+                .onAction(function (data) {
+                    selectServiceStatic(data.result[0], rf);
+                });
+            })(this);
+        }
     }
 
 
     graphHandler.prototype.selectService = function (data) {
         //alert('selectService: '+JSON.stringify(data));
-        $('#dialog-content').html('data acquisition...');
+        $('#dialog-content').html('preparing for data acquisition...');
         (function(dt, rf) {
         webinos.discovery.findServices(
             new ServiceType(dt.api),
@@ -134,7 +150,8 @@ function graphHandler() {
 
                     service.bind({
                         onBind: function(){
-                            getNewSensorData(rf);
+                            //getNewSensorData(rf);
+                            rf.selectAcquisitionMode();
                         }
                     });
 
@@ -144,6 +161,28 @@ function graphHandler() {
         })(data, this);
  
     }
+
+
+    graphHandler.prototype.selectAcquisitionMode = function () {
+        var htmlCode = '';
+        htmlCode += 'Sensor: '+this.sensors4Choice[this.sensorSelected].description+'<br>';
+        htmlCode += 'Select acquisition mode:<br>';
+        htmlCode += '<select id=\''+this.mainDiv+'SelectAM\'>';
+        htmlCode += '<option value=\'-1\'>Choose mode</option>';
+        htmlCode += '<option value=\'0\'>Single data</option>';
+        htmlCode += '<option value=\'1\'>Continuous</option>';
+        htmlCode += '</select>';
+        $('#dialog-content').html(htmlCode);
+        (function(mDiv, rf) {
+            $('#'+mDiv+'SelectAM').change(function() {
+                rf.acquisitionMode = +($('#'+rf.mainDiv+'SelectAM').val());
+                //alert('Acquisition mode is '+rf.acquisitionMode);
+                $('#dialog-content').html('');
+                getNewSensorData(rf);
+            });
+        })(this.mainDiv, this);
+    }
+
 
 /*
     graphHandler.prototype.selectSensor = function () {
@@ -184,12 +223,14 @@ function graphHandler() {
     graphHandler.prototype.saveData = function(event) {
         //alert('saveData - '+this.sensors4Choice[this.sensorSelected].description);
         var time=new Date(event.timestamp);
-        var htmlCode = '';
-        htmlCode += 'Timestamp: '+time.toDateString()+'<br>';
-        for(var i=0; i<event.sensorValues.length; i++) {
-            htmlCode += 'Value '+i+': '+event.sensorValues[i]+'<br>';
+        if(this.acquisitionMode == 0) {
+            var htmlCode = '';
+            htmlCode += 'Timestamp: '+time.toDateString()+'<br>';
+            for(var i=0; i<event.sensorValues.length; i++) {
+                htmlCode += 'Value '+i+': '+event.sensorValues[i]+'<br>';
+            }
+            $('#dialog-content').html(htmlCode);
         }
-        $('#dialog-content').html(htmlCode);
         storeData(this.index, this.sensorType, time, event.sensorValues);
     }
 
