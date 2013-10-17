@@ -14,6 +14,7 @@ function graphHandler() {
     this.historicData = null;
     this.acquisitionInProgress = false;
     this.acquisitionMode = -1;
+    this.showingData = false;
 
     /* type is the type of data to be shown in graph:
        -0 = mom blood pressure
@@ -98,6 +99,7 @@ function graphHandler() {
 
 
     graphHandler.prototype.dataAcquisition = function () {
+        this.showingData = false;
         if(this.acquisitionInProgress) {
             var htmlCode = '';
             htmlCode += 'Acquisition in progress...<br>';
@@ -129,7 +131,14 @@ function graphHandler() {
                         }
                 })
                 .onAction(function (data) {
-                    selectServiceStatic(data.result[0], rf);
+                    if(data.result.length > 0) {
+                        selectServiceStatic(data.result[0], rf);
+                    }
+                    else {
+                        var htmlCode = '';
+                        htmlCode += 'No sensor selected...';
+                        $('#dialog-content').html(htmlCode);
+                    }
                 });
             })(this);
         }
@@ -222,6 +231,7 @@ function graphHandler() {
 
     graphHandler.prototype.saveData = function(event) {
         //alert('saveData - '+this.sensors4Choice[this.sensorSelected].description);
+        //alert(JSON.stringify(event));
         var time=new Date(event.timestamp);
         if(this.acquisitionMode == 0) {
             var htmlCode = '';
@@ -232,11 +242,18 @@ function graphHandler() {
             $('#dialog-content').html(htmlCode);
         }
         storeData(this.index, this.sensorType, time, event.sensorValues);
+        if(this.showingData) {
+            //alert(JSON.stringify(this.historicData));
+            this.historicData.timestamp.push(time);
+            this.historicData.values.push(event.sensorValues[0]);
+            this.showGraph();
+        }
     }
 
 
     graphHandler.prototype.selectGraph = function() {
         this.historicData = retrieveData(this.index, this.sensorType);
+        this.showingData = true;
         //TODO At the moment a table is displayed; add more options for showing data
         // (ie type of graphs, time period selection, ...)
         var htmlCode = '';
