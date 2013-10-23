@@ -637,7 +637,8 @@ function addMidwifeTabs() {
 
     var htmlCode = '';
     htmlCode += '<div id=\'midwifeTab\'>';
-    htmlCode += '<input type=\'button\' value=\'Connect new baby\' class=\'buttonGeneric\' onclick=\'connectNewBaby()\'>';
+    //htmlCode += '<input type=\'button\' value=\'Connect new baby\' class=\'buttonGeneric\' onclick=\'connectNewBaby()\'>';
+    htmlCode += '<input type=\'button\' value=\'Connect new baby\' class=\'buttonGeneric\' onclick=\'connectToBaby(null, null)\'>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
 

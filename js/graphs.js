@@ -4,6 +4,7 @@ function graphHandler() {
 
     this.mainDiv = null;
     this.index;
+    this.type;
     this.sensorType = -1;
     this.availableSensors = null;
     this.sensors4Choice = null;
@@ -31,6 +32,7 @@ function graphHandler() {
 
         this.mainDiv = divName;
         this.index = index;
+        this.type = type;
         this.sensorType = type;
         this.availableSensors = new Array();
         var htmlCode = '<br><table>';
@@ -109,6 +111,8 @@ function graphHandler() {
             (function(mDiv, rf) {
                 $('#'+mDiv+'SA').click(function() {
                     stopDataAcquisition(rf);
+                    $('#dialog-content').html('');
+                    $('#dialog-container').fadeOut(300);
                 });
             })(this.mainDiv, this);
         }
@@ -174,13 +178,15 @@ function graphHandler() {
 
     graphHandler.prototype.selectAcquisitionMode = function () {
         var htmlCode = '';
-        htmlCode += 'Sensor: '+this.sensors4Choice[this.sensorSelected].description+'<br>';
-        htmlCode += 'Select acquisition mode:<br>';
-        htmlCode += '<select id=\''+this.mainDiv+'SelectAM\'>';
+        htmlCode += '<table>';
+        htmlCode += '<tr><td>Sensor: '+this.sensors4Choice[this.sensorSelected].description+'</td></tr>';
+        htmlCode += '<tr><td>Select acquisition mode:</td></tr>';
+        htmlCode += '<tr><td><select id=\''+this.mainDiv+'SelectAM\'>';
         htmlCode += '<option value=\'-1\'>Choose mode</option>';
         htmlCode += '<option value=\'0\'>Single data</option>';
         htmlCode += '<option value=\'1\'>Continuous</option>';
-        htmlCode += '</select>';
+        htmlCode += '</select></td></tr>';
+        htmlCode += '</table>';
         $('#dialog-content').html(htmlCode);
         (function(mDiv, rf) {
             $('#'+mDiv+'SelectAM').change(function() {
@@ -241,18 +247,18 @@ function graphHandler() {
             }
             $('#dialog-content').html(htmlCode);
         }
-        storeData(this.index, this.sensorType, time, event.sensorValues);
+        storeData(this.index, this.type, time, event.sensorValues);
         if(this.showingData) {
             //alert(JSON.stringify(this.historicData));
-            this.historicData.timestamp.push(time);
-            this.historicData.values.push(event.sensorValues[0]);
+            //this.historicData.timestamp.push(time);
+            //this.historicData.values.push(event.sensorValues[0]);
             this.showGraph();
         }
     }
 
 
     graphHandler.prototype.selectGraph = function() {
-        this.historicData = retrieveData(this.index, this.sensorType);
+        this.historicData = retrieveData(this.index, this.type);
         this.showingData = true;
         //TODO At the moment a table is displayed; add more options for showing data
         // (ie type of graphs, time period selection, ...)
@@ -297,7 +303,8 @@ function graphHandler() {
         if(viewType == 0) {
             htmlCode += '<table><tr><td>Date</td><td>Value</td></tr>';
             for(var i=0; i<data.timestamp.length; i++) {
-                htmlCode += '<tr><td>'+data.timestamp[i].toDateString()+'</td><td>'+data.values[i]+'</td></tr>';
+                //htmlCode += '<tr><td>'+data.timestamp[i].toDateString()+'</td><td>'+data.values[i]+'</td></tr>';
+                htmlCode += '<tr><td>'+data.timestamp[i].toString()+'</td><td>'+data.values[i]+'</td></tr>';
             }
             htmlCode += '</table>';
             $('#dialog-content-graph').html(htmlCode);
