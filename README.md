@@ -64,6 +64,8 @@ Please follow the README instruction in quarqd-ext
     cd webinos_pzp
     node ./webinos_pzp
 
+Note: you might need sudo to run webinos_pzp as it need the right to open serial ports created.
+
 Load Chromium/Firefox Browser, open page
 
     http://localhost:8080/hub-webinosHealth/index.html
