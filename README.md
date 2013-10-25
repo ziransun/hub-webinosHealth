@@ -18,6 +18,19 @@ open package.json in an editor, append the following lines in "dependencies" -
     "webinos-api-iot"           : "git://github.com/webinos/webinos-api-iot.git",
     "webinos-api-file"          : "git://github.com/webinos/webinos-api-file.git",
 
+
+File API needs to be configured. Here is an example of config.json
+<pre>
+{ "name": "file",
+  "params": {
+    "local": {
+      "server": {"port": 9999, "hostname": "0.0.0.0"},
+      "shares": [{"name": "PC-SHARE", "path": "$HOME"}]
+    }
+  }
+}
+</pre>
+
 Now install all the npm modules in PZP -
   
     npm install

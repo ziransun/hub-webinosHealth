@@ -93,15 +93,16 @@ function getOtherBabies(cbk) {
     queryBabyInfo(cbk); 
 }
 
-function momHealth(){
- 
-  window.open("http://localhost:8080/health-data/index.html");
+function setDevice(){
+
+  window.open("http://localhost:8080/health-data/dashboard.html");
 }
 
-function babyHealth(){
+function readData(){
  
-  window.open("http://localhost:8080/health-data/index.html");
+  window.open("http://localhost:8080/health-data/presentation.html");
 }
+
 
 
 function addMyBabyInfo(index) {
@@ -190,6 +191,7 @@ function addBabyTab(tabName, isMine, babyId) {
     var tabInnerGraphs = tabId+'InnerGraphs';
     var tabRB = tabId+'RB';
     var tabCI = tabId+'CI';
+    var tabSD = tabId+'SD';
     var tabBH = tabId+'BH';
     var htmlCode = '';
     var age;
@@ -223,7 +225,9 @@ function addBabyTab(tabName, isMine, babyId) {
         htmlCode += '<tr><td><input type=\'button\' value=\'Change baby info\' class=\'buttonGeneric\' id=\''+tabCI+'\'></td></tr>';
     }
     htmlCode += '<tr><td><input type=\'button\' value=\'Remove\' class=\'buttonGeneric\' id=\''+tabRB+'\'></td></tr>';
-    htmlCode += '<tr><td><input type=\'button\' value=\'Baby Health\' class=\'buttonGeneric\' id=\''+tabBH+'\'></td></tr>';
+    
+    htmlCode += '<tr><td><input type=\'button\' value=\'Set Health Devices\' class=\'buttonGeneric\' id=\''+tabSD+'\'></td></tr>';
+    htmlCode += '<tr><td><input type=\'button\' value=\'Read Baby Health Data\' class=\'buttonGeneric\' id=\''+tabBH+'\'></td></tr>';
     
     htmlCode += '</table>';
     htmlCode += '<br><br>';
@@ -237,7 +241,11 @@ function addBabyTab(tabName, isMine, babyId) {
     })(tabRB, tabId);
     
     (function(ln, tn) {
-        $('#'+ln).click(function() {babyHealth()});
+        $('#'+ln).click(function() {setDevice()});
+    })(tabSD);
+    
+    (function(ln, tn) {
+        $('#'+ln).click(function() {readData()});
     })(tabBH);
     
     if(isMine) {
@@ -345,7 +353,8 @@ function updateBabyTab(tabName, isMine, babyId) {
     htmlCode += '<table>';
     htmlCode += '<tr><td><input type=\'button\' value=\'Change baby info\' class=\'buttonGeneric\' id=\''+tabCI+'\'></td></tr>';
     htmlCode += '<tr><td><input type=\'button\' value=\'Remove\' class=\'buttonGeneric\' id=\''+tabRB+'\'></td></tr>';
-    htmlCode += '<tr><td><input type=\'button\' value=\'Baby Health\' class=\'buttonGeneric\' id=\''+tabBH+'\'></td></tr>';
+    htmlCode += '<tr><td><input type=\'button\' value=\'Set Health devices\' class=\'buttonGeneric\' id=\''+tabSD+'\'></td></tr>';
+    htmlCode += '<tr><td><input type=\'button\' value=\'Read baby health data\' class=\'buttonGeneric\' id=\''+tabBH+'\'></td></tr>';
     htmlCode += '</table>';
     htmlCode += '</div>';
     $('#target').append(htmlCode);
@@ -354,7 +363,10 @@ function updateBabyTab(tabName, isMine, babyId) {
         $('#'+ln).click(function() {removeTab(tn)});
     })(tabRB, tabId);
     (function(ln, tn) {
-        $('#'+ln).click(function() {babyHealth()});
+        $('#'+ln).click(function() {setDevice()});
+    })(tabSD, tabId);
+    (function(ln, tn) {
+        $('#'+ln).click(function() {readData()});
     })(tabBH, tabId);
     (function(ln, bi) {
         $('#'+ln).click(function() {addMyBabyInfo(bi)});
@@ -445,8 +457,6 @@ function removeTab(tabId) {
     //displayTab(tabList[0].tabId);
     displayTab(tabList[0].tabId, tabList, 'buttonTabSelected', 'buttonTab');
 }
-
-
 
 function addProfileTab() {
     var htmlCode = '';
@@ -590,7 +600,8 @@ function addMomTabs() {
     htmlCode += '<table>';
     htmlCode += '<tr><td><input type=\'button\' value=\'Add my baby\' class=\'buttonGeneric\' onclick=\'addMyBabyInfo(-1)\'></td>';
     htmlCode += '<td><input type=\'button\' value=\'Change my info\' class=\'buttonGeneric\' onclick=\'askMomInfo()\'></td></tr>';
-    htmlCode += '<td><input type=\'button\' value=\'My Health\' class=\'buttonGeneric\' onclick=\'momHealth()\'></td></tr>';
+    htmlCode += '<td><input type=\'button\' value=\'Set Health Devices\' class=\'buttonGeneric\' onclick=\'setDevice()\'></td>';
+    htmlCode += '<td><input type=\'button\' value=\'Read Health Data\' class=\'buttonGeneric\' onclick=\'readData()\'></td></tr>';
     htmlCode += '</table>';
     htmlCode += '<br><br>';
     htmlCode += '<div id=\'momInnerTabs\'>';
