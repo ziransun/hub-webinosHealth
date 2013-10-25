@@ -18,6 +18,9 @@ open package.json in an editor, append the following lines in "dependencies" -
     "webinos-api-iot"           : "git://github.com/webinos/webinos-api-iot.git",
     "webinos-api-file"          : "git://github.com/webinos/webinos-api-file.git",
 
+Remove unrelevant drivers in IOT. 
+
+	rm -rf webinos-driver-fake
 
 File API needs to be configured. Here is an example of config.json
 <pre>

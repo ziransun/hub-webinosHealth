@@ -93,17 +93,18 @@ function getOtherBabies(cbk) {
     queryBabyInfo(cbk); 
 }
 
+//temp solution
 function setDevice(){
 
-  window.open("http://localhost:8080/health-data/dashboard.html");
+  window.open("http://localhost:8080/hub-webinosHealth/health-data/dashboard.html");
+  
 }
 
 function readData(){
  
-  window.open("http://localhost:8080/health-data/presentation.html");
+  window.open("http://localhost:8080/hub-webinosHealth/health-data/presentation.html");
+  
 }
-
-
 
 function addMyBabyInfo(index) {
     var defName;
