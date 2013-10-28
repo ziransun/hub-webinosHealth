@@ -93,17 +93,12 @@ function getOtherBabies(cbk) {
     queryBabyInfo(cbk); 
 }
 
-//temp solution
 function setDevice(){
-
-  window.open("http://localhost:8080/hub-webinosHealth/health-data/dashboard.html");
-  
+  window.location = "health-data/dashboard.html";
 }
 
 function readData(){
- 
-  window.open("http://localhost:8080/hub-webinosHealth/health-data/presentation.html");
-  
+  window.location = "health-data/presentation.html";
 }
 
 function addMyBabyInfo(index) {
@@ -469,7 +464,7 @@ function addProfileTab() {
     htmlCode += '<td>';
     htmlCode += '<select id=\'profile\' class=\'selectClass\'>';
     htmlCode += '<option value=\'Profile\'>';
-    htmlCode += 'Choose Your Profile';
+    htmlCode += 'Choose Your Profile'; 
     htmlCode += '</option>';
     htmlCode += '<option value=\'Mom\'>';
     htmlCode += 'Mom';
@@ -482,6 +477,23 @@ function addProfileTab() {
     htmlCode += '</tr>';
     
     $('#rightcolumn').html(htmlCode);
+    
+    if(typeof(Storage)!=="undefined")
+  	{
+    	var profilevalue = localStorage.getItem('profileVal');
+    	$('#profile').val(profilevalue);
+    	var profilevalue = $('#profile').val();
+    	if((profilevalue === 'Mom') || (profilevalue === 'Midwife')) 
+    	{
+    		launchPage();
+    	}	
+    	else
+    	{
+    	}
+  	}
+	else
+  	{
+  	} 
 }
 
 
@@ -696,6 +708,7 @@ function launchPage(){
     $('#target').html('');
     $('#leftcolumn').html('');
     if(profileVal === 'Mom') {
+    localStorage.setItem('profileVal', profileVal);
         //Retrieve my baby list
         getMyBabies(function(res) {
             mybabyList = res;
@@ -705,6 +718,7 @@ function launchPage(){
         });
     }
     else if (profileVal === 'Midwife') {
+ 	localStorage.setItem('profileVal', profileVal);
         //Retrieve midwife's baby list
         getOtherBabies(function(res) {
             babyList = res;
