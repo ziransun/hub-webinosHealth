@@ -748,13 +748,17 @@ function launchPage(){
 
 function connectNewBaby() {
     //TODO This should connect to a remote db
-    var htmlCode = '';
+    /*var htmlCode = '';
     htmlCode += '<br><br>Connect to a new baby<br>';
     htmlCode += 'Baby name: <input type=\'text\' id=\'midwifeBabyName\'><br>';
     htmlCode += 'Mother name: <input type=\'text\' id=\'midwifeMotherName\'><br>';
     htmlCode += '<input type=\'button\' value=\'Connect\' onclick=\'newBabyConnection()\'>';
     $('#dialog-content').html(htmlCode);
-    $('#dialog-container').fadeIn(1000);
+    $('#dialog-container').fadeIn(1000); */
+    
+    //divert to dashboard people page
+    webinos.dashboard.open({module:'enrollment'}, function(){console.log("User People icon to connect to another person");});
+   
 }
 
 
