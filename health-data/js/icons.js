@@ -13,6 +13,7 @@ var icons = {
 	"http://webinos.org/api/sensors/bloodsugar": "bloodsugar-icon.png",
 	"http://webinos.org/api/sensors/bloodpressure": "bloodpressure-icon.png",
 	"http://webinos.org/api/sensors/pedometer": "pedometer-icon.png",
+	"http://webinos.org/api/sensors/oximeter": "oximeter-icon.png",
     "http://webinos.org/api/sensors/rpm": "obd-icon.png",
     "http://webinos.org/api/sensors/vss": "obd-icon.png",
     "http://webinos.org/api/sensors/load_pct": "obd-icon.png",
