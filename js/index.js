@@ -686,7 +686,7 @@ function addMidwifeTabs() {
     var htmlCode = '';
     htmlCode += '<div id=\'midwifeTab\'>';
     htmlCode += '<input type=\'button\' value=\'Connect new baby\' class=\'buttonGeneric\' onclick=\'connectNewBaby()\'>';
-    htmlCode += '<input type=\'button\' value=\'Select Health Devices\' class=\'buttonGeneric\' onclick=\'setDevice()\'>';
+    /*htmlCode += '<input type=\'button\' value=\'Select Health Devices\' class=\'buttonGeneric\' onclick=\'setDevice()\'>'; */
     htmlCode += '<input type=\'button\' value=\'Read Health Data\' class=\'buttonGeneric\' onclick=\'readData()\'>';	
     htmlCode += '</div>';
     $('#target').append(htmlCode);
