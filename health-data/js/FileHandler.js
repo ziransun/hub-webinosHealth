@@ -2,6 +2,7 @@ var root_directory = {};
 
 var file_name_for_rules = "hub_rules.txt";
 var file_name_sensor_actuator_explorer = "hub_rules_explorer.txt";
+var file_name_facebook_configure = "hub_facebook_configure.txt";
 
 function save_file(data, file_name){
 	root_directory.getFile(file_name, {create: true, exclusive: false}, 
@@ -14,13 +15,15 @@ function save_file(data, file_name){
 					}
 
 					writer.onwrite = function (evt) {
-						if (!written) {
-							written = true;
-							writer.write(new Blob([JSON.stringify(data)]));
-						}
-					}
-					
-					writer.truncate(0);
+                            
+                    }
+                    
+                    if (!written) {
+                            written = true;
+                            writer.write(new Blob([JSON.stringify(data)]));
+                    }
+
+                    //writer.truncate(0);
 				}, 
 				function (error){
 					alert("Error retrieving file writer (#" + error.name + ")");
@@ -34,8 +37,9 @@ function save_file(data, file_name){
 }
 
 /*
+	askConfirm = true if you want an alert to ask a confirm
 	file_name
-	show_rules = show in the scree or not.
+	show_rules = show in the screen or not.
 	id = sensor or actuator id to remove in the file.
 	type = is a sensor or is an actuator?
 */
@@ -105,6 +109,12 @@ function load_file(askConfirm, file_name, show_rules, id, type){
 							for(var t=0; t<contents.explorer_actuators.length; t++){
 								searchActuators(contents.explorer_actuators[t].actuatorID, contents.explorer_actuators[t].actuatorAddress);
 							}
+							//load device orientation devs that user selected in past time.
+							for(var t=0; t<contents.explorer_deviceorientation.length; t++){
+								searchDeviceOrientation(contents.explorer_deviceorientation[t].devID, contents.explorer_deviceorientation[t].devAddress);
+							}
+						} else if(file_name == file_name_facebook_configure){
+							GUIaskForAppID(contents.appID);
 						}
 					}
 					catch(err){
@@ -113,7 +123,13 @@ function load_file(askConfirm, file_name, show_rules, id, type){
 				}
 
 				myentry.file(function (fileR) {
+					
 					r.readAsText(fileR);
+
+					if(file_name == file_name_facebook_configure){
+						GUIaskForAppID("");
+					}
+
 				}, function (error) {
 					alert("Error retrieving file (#" + error.name + ")");
 				});
@@ -157,10 +173,17 @@ function save_rules(askConfirm){
 					if(x.split("_")[0] == "userInput")
 						return $('#input_val_'+x).val();
 					else if(x.split("_")[0] == "actuator"){
+						var textPosted = "";
+						if(textToPost[x] != undefined)
+							textPosted = textToPost[x];
 						return ({
 							"false":$('#actuator_false_'+x).val(),
-							"true":$('#actuator_true_'+x).val()
+							"true":$('#actuator_true_'+x).val(),
+							"textPosted" : textPosted
 						});
+					}
+					else if(x.split("_")[0] == "devOrientation"){
+						return $("#select_"+x).val();
 					}
 					else
 						return "";
@@ -224,6 +247,14 @@ function save_rules_sa_explorer(){
 		});
 	}
 
+	rules_to_save["explorer_deviceorientation"] = [];
+	for(var i in devsOrientation){
+		rules_to_save["explorer_deviceorientation"].push({
+			devID: i,
+			devAddress: devsOrientation[i].serviceAddress
+		});
+	}
+
 	setTimeout(function (){
 		save_file(rules_to_save,file_name_sensor_actuator_explorer);
 	}, 1000);
@@ -256,11 +287,22 @@ function paintOneBlock(box){
 			result = that.GUIActuatorBox(box.coord, actuators[box.boxSpecific], id);
 			$("#actuator_false_"+result).val(box.userInputValue.false);
 			$("#actuator_true_"+result).val(box.userInputValue.true);
+			textToPost[result] = box.userInputValue.textPosted;
 			addOutputBox(result);
 			break;
 		case "bool":
 			result = that.GUIBoolBox(box.coord, box.boxSpecific, id);
 			addProcessingBox(result);
+			break;
+		case "devOrientation":
+			result = that.GUIDeviceOrientation(box.coord, devsOrientation[box.boxSpecific], id);
+			//$("#select_"+result).val(box.userInputValue);
+			$("#select_"+result+" option").each(function(){
+				//if($(this).val() === box.userInputValue)
+				if($(this).val() == box.userInputValue)
+					$(this).attr("selected",true);
+			});
+			addInputBox(result);
 			break;
 		default:
 			alert("Error");
@@ -337,12 +379,20 @@ function addConnectionBetweenTwoBoxes(box, boxIDassociated){
 
 function clearAll_for_rules(){
 
-	//remove event listener:
-	for(i in sensorActive){
-		numListenerToRemove = sensorActive[i];
+	//remove event listener for sensor
+	for(service_app_id in sensorActive){
+		numListenerToRemove = sensorActive[service_app_id];
 		for(var x=0; x<numListenerToRemove; x++)
-			sensors[i].removeEventListener('sensor', onSensorEvent, false);
-        sensorActive[i] = 0;
+			sensors[service_app_id].removeEventListener('sensor', function(e){ onSensorEvent(service_app_id, e)}, false);
+        sensorActive[service_app_id] = 0;
+	}
+
+	//remove event listener for device orientation
+	for(service_app_id in devsOrientationActive){
+		numListenerToRemove = devsOrientationActive[service_app_id];
+		for(var x=0; x<numListenerToRemove; x++)
+			devsOrientation[service_app_id].removeEventListener("deviceorientation", function(e){ onDeviceOrientationEvent(service_app_id, e)}, true);
+        devsOrientationActive[service_app_id] = 0;
 	}
 
 	for(x in block_list){
@@ -357,4 +407,10 @@ function clearAll_for_rules(){
 
 	block_list = {};
 	connections = [];
+}
+
+function save_facebook_config(data){
+	var facebook_config_data = {};
+	facebook_config_data["appID"] = data;
+	save_file(facebook_config_data, file_name_facebook_configure);	
 }

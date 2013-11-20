@@ -1,3 +1,14 @@
+var service_types = [
+    "http://webinos.org/api/sensors/*",
+    "http://webinos.org/api/actuators/*",
+    "http://webinos.org/api/deviceorientation"
+];
+
+function getId(service){
+    var deviceName = service.serviceAddress.substr(service.serviceAddress.lastIndexOf("/")+1);
+    deviceName = deviceName.split('.').join("");
+    return service.id+""+deviceName;
+}
 
     var _initialised = false,
         connections = [],
@@ -11,6 +22,9 @@
                 }else if(conn.sourceId.indexOf("userInput") !== -1){
                     var param = conn.getParameters();
                     settingUserInputConnection(conn.sourceId, conn.targetId, param.position);
+                }if(conn.sourceId.indexOf("devOrientation") !== -1){
+                    var param = conn.getParameters();
+                    settingSensorConnection(conn.sourceId, conn.targetId, param.position);
                 }else if(conn.sourceId.indexOf("operation") !== -1){
                     settingProcessingConnection(conn.sourceId, conn.targetId);
                 }else if(conn.sourceId.indexOf("bool") !== -1){
@@ -27,6 +41,9 @@
                 if (idx != -1) connections.splice(idx, 1);
 
                 if(conn.sourceId.indexOf("sensor") !== -1){
+                    var param = conn.getParameters();
+                    removeInputConnection(conn.sourceId, conn.targetId, param.position);
+                }if(conn.sourceId.indexOf("devOrientation") !== -1){
                     var param = conn.getParameters();
                     removeInputConnection(conn.sourceId, conn.targetId, param.position);
                 }else if(conn.sourceId.indexOf("userInput") !== -1){
@@ -116,13 +133,6 @@
     /***************  ON READY FUNCTION FOR JsPlump Library   *********************/
 
     jsPlumb.bind("ready", function() {
-
-        $(window).on('beforeunload', function(e) {    
-        //TODO stop all sensors
-            clearAll_for_rules();
-            //return true;
-        });
-        
         //jsPlumb.reset();
         jsPlumb.setRenderMode(jsPlumb.SVG);
         jsPlumbDemo.init();
@@ -133,15 +143,6 @@
         var contentDiv = $('#content');
         contentDiv.tinyscrollbar();
 
-        if(!explorer_enabled){
-            $("#refresh").append("<div id='refresh_button' class='button'>Refresh</div>");
-            findSensorServices(leftColumn);
-        }
-        else{
-            $("#refresh").append("<div id='explorer_sensor_button' class='button'>Add Sensor From Explorer</div>");
-            $("#refresh").append("<div id='explorer_actuator_button' class='button'>Add Actuator From Explorer</div>");
-        }
-
         $(window).resize(function() {
             leftColumn.tinyscrollbar_update();
             contentDiv.tinyscrollbar_update();
@@ -151,15 +152,6 @@
 
         //search file system and save the root directory.
         findFileSystem(leftColumn);
-
-        $('#refresh_button').live( 'click',function(event){
-                findSensorServices(leftColumn);
-        });
-
-        $('#explorer_sensor_button').live( 'click',function(event){
-            var leftColumn = $('#leftcolumn');
-            callExplorerSensor(leftColumn);
-        });
 
         $('#explorer_actuator_button').live( 'click',function(event){
             var leftColumn = $('#leftcolumn');
@@ -179,38 +171,56 @@
         });
 
         $(document).on("click","#but_home", function(event){
-            
             clearAll_for_rules();
             window.location = "index.html";
         });
+
+        $('#close').on("click", function(event){
+            var popup = $("#settings-container");
+            popup.fadeOut();
+        });
+
+        $(window).on('beforeunload', function(e) {    
+            clearAll_for_rules();
+        }); 
     });
+    
 
-
-    function callExplorerSensor(container) {
+    function callExplorerActuator(container) {
         webinos.dashboard
             .open({
                     module: 'explorer',
-                    data: { service:'http://webinos.org/api/sensors.*' }
+                    data: { 
+                        service: service_types,
+                        multiselect: true
+                    }
                   }
                 , function(){ console.log("***Dashboard opened");} )
-                  .onAction( function (data) { 
-                    for(var i in data.result)
-                        serviceDiscovery(container, data.result[i]); 
+                  .onAction( function (data) {
+                    for(var i in data.result){
+                        if(data.result[i].api.indexOf("sensors") !== -1)
+                            serviceDiscovery(container, data.result[i]); 
+                        else if(data.result[i].api.indexOf("actuators") !== -1)
+                            actuatorDiscovery(container, data.result[i]);
+                        else if(data.result[i].api.indexOf("deviceorientation") !== -1)
+                            deviceOrientationDiscovery(container, data.result[i]);
+                    }
+                            
+                    
             });
     }
 
     function serviceDiscovery(container, serviceFilter){
         webinos.discovery.findServices(new ServiceType(serviceFilter.api), {
             onFound: function (service) {
-                if ((service.id === serviceFilter.id) && (service.address === serviceFilter.serviceAddress) && (typeof(sensors[service.id]) === "undefined")) {
+                var service_app_id = getId(service);
+                if ((service.id == serviceFilter.id) && (service.serviceAddress == serviceFilter.address) && (typeof(sensors[service_app_id]) === "undefined")) {
                     //found a new sensors
-                    sensors[service.id] = service;
-                    sensorActive[service.id] = 0;
+                    sensors[service_app_id] = service;
+                    sensorActive[service_app_id] = 0;
                     service.configureSensor({rate: 500, eventFireMode: "fixedinterval"}, 
                         function(){
-                            myConfigureSensor(service);
-                            //save on file the new sensor added
-                            save_rules_sa_explorer();
+                            myConfigureSensor(service, true);
                         },
                         function (){
                             console.error('Error configuring Sensor ' + service.api);
@@ -221,27 +231,46 @@
         });
     }
 
-    function callExplorerActuator(container) {
-        webinos.dashboard
-            .open({
-                    module: 'explorer',
-                    data: { service:'http://webinos.org/api/actuators.*' }
-                  }
-                , function(){ console.log("***Dashboard opened");} )
-                  .onAction( function (data) { 
-                    for(var i in data.result)
-                        actuatorDiscovery(container, data.result[i]); 
-            });
-    }
-
     function actuatorDiscovery(container, serviceFilter){
         webinos.discovery.findServices(new ServiceType(serviceFilter.api), {
             onFound: function (service) {
-                if ((service.id === serviceFilter.id) && (service.address === serviceFilter.serviceAddress) && (typeof(actuators[service.id]) === "undefined")) {
-                    myConfigureActuator(service);
-                    //save on file the new actuator added
-                    save_rules_sa_explorer();
+                var service_app_id = getId(service);
+                if ((service.id == serviceFilter.id) && (service.serviceAddress == serviceFilter.address) && (typeof(actuators[service_app_id]) === "undefined")) {
+                    myConfigureActuator(service, true);
                 }
             }
         });
+    }
+
+    function deviceOrientationDiscovery(container, serviceFilter){
+
+        webinos.discovery.findServices(new ServiceType(serviceFilter.api), {
+            onFound: function (service) {
+                service.bindService({
+                    onBind:function(){
+                        var service_app_id = getId(service);
+                        if ((service.id == serviceFilter.id) && (service.serviceAddress == serviceFilter.address) && (typeof(devsOrientation[service_app_id]) === "undefined")) {
+                            devsOrientation[service_app_id] = service;
+                            devsOrientationActive[service_app_id] = 0;
+                            //GUI
+                            GUIdeviceOrientationRightSide(service, true);
+                        }
+                    }
+                });
+            }
+        });
+/*
+        webinos.discovery.findServices(new ServiceType('http://webinos.org/api/deviceorientation'), {
+            onFound: function (service) {
+                service.bindService({
+                    onBind:function(){
+                        var service_app_id = getId(service);
+                        devsOrientation[service_app_id] = service;
+
+                        //GUI
+                        GUIdeviceOrientationRightSide(service);
+                    }
+                });
+            }
+        });*/
     }

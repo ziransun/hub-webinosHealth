@@ -313,7 +313,7 @@ jQuery(document).ready(function() {
     $(document).on("click","#but_home", function(event){
         
         clearAll_for_graphics();
-        window.location = "../index.html";
+        window.location = "index.html";
     });
 
 	$("#sensor_id_config").hide();

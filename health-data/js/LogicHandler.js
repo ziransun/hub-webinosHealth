@@ -4,6 +4,12 @@ var block_list = {};
 
 var textinput_array = new Array();
 
+//only for twitter and facebook - [key = idBox; val = PostText]
+var textToPost = {};
+
+//all actual value for sensors and actuators - [key = id_Sensor_or_Actuato; val = value]
+var values_sa = {};
+
 function Input(id){
 	var inputID = id;
 	//var processing_callback;
@@ -53,7 +59,7 @@ function Processing(ic, id){
 	var allElementsAreCharged = function(){
 		var flag = true;
 		for(var ids in input_nodes){
-			if(input_nodes[ids].length === 0 || input_nodes[ids]==null){
+			if(input_nodes[ids].length == 0 || input_nodes[ids] == null){
 				flag = false;
 				break;
 			}
@@ -130,13 +136,23 @@ function Processing(ic, id){
 function Output(cb, id){
 	var inner_callback = cb;
 	var boxID = id;
+	var val_array = [];
 
 	var output_callback = function(state){
 		if(inner_callback){
 			if(boxID!=null)
-				inner_callback(state, boxID);
+				val_array = inner_callback({
+					"state" : state,
+					"boxID" : boxID,
+					"prevVal" : val_array
+				});
+		/*
+		if(inner_callback){
+			if(boxID!=null)
+				val_array = inner_callback(state, boxID);
 			else
-				inner_callback(state);
+				val_array = inner_callback(state);
+		*/
 		}
 	}
 
@@ -149,23 +165,49 @@ function Output(cb, id){
 /******************************************  FUNCTIONS  ******************************************/
 
 
-var onSensorEvent = function(event){
-	var sensor = {};
-	if(typeof event !== "undefined"){
-		sensor = sensors[event.sensorId];
-		sensor.values = event.sensorValues[0] || 0;
+var onSensorEvent = function(sensorID, event){
+	console.log("***** sensorID:::: " + sensorID);
+	var value = event.sensorValues[0] || 0;
+
+	$("[id=value_"+sensorID+"]").empty();
+	$("[id=value_"+sensorID+"]").text(value);
+
+	//save the actual value in object values_sa
+	values_sa[sensorID] = value;
+
+	for(var n in block_list){
+		if(n.indexOf(sensorID) !== -1)
+			block_list[n].input_callback(value);
 	}
+	
+}
 
-	if (sensor){
 
-		//$("#value_"+sensor.id).empty();
-		$("[id=value_"+sensor.id+"]").empty();
-		//$("#value_"+sensor.id).text(sensor.values);
-		$("[id=value_"+sensor.id+"]").text(sensor.values);
+var onDeviceOrientationEvent = function(idDeviceOrientation, event){
+    // gamma is the left-to-right tilt in degrees, where right is positive
+	var tiltLR = event.gamma;
+	// beta is the front-to-back tilt in degrees, where front is positive
+	var tiltFB = event.beta;
+	// alpha is the compass direction the device is facing in degrees
+	var dir = event.alpha;
 
-		for(var n in block_list){
-			if(n.indexOf(sensor.id) !== -1)
-				block_list[n].input_callback(sensor.values);
+	$("[id=value_alfa_"+idDeviceOrientation+"]").empty();
+	$("[id=value_alfa_"+idDeviceOrientation+"]").text("Alfa: " + dir);
+
+	$("[id=value_beta_"+idDeviceOrientation+"]").empty();
+	$("[id=value_beta_"+idDeviceOrientation+"]").text("Beta: " + tiltFB);
+
+	$("[id=value_gamma_"+idDeviceOrientation+"]").empty();
+	$("[id=value_gamma_"+idDeviceOrientation+"]").text("Gamma: "+ tiltLR);
+
+	for(var n in block_list){
+		if(n.indexOf(idDeviceOrientation) !== -1){
+			if($("#select_"+n).val() == "alfa")
+				block_list[n].input_callback(dir);
+			else if($("#select_"+n).val() == "beta")
+				block_list[n].input_callback(tiltFB);
+			else if($("#select_"+n).val() == "gamma")
+				block_list[n].input_callback(tiltLR);
 		}
 	}
 }
@@ -220,66 +262,123 @@ var ORManagment = function(values){
 	return -1;	
 }
 
-var setActuatorState = function(state,aid){
+var setActuatorState = function(argumentsObj){
+	//argumentsObj is an object
+	//argumentsObj.state = state
+	//argumentsObj.aid = boxID
+	//argumentsObj.prevVal = val setted on previous loop
+	var state = argumentsObj.state;
+	var aid = argumentsObj.boxID;
+
 	var actuatorID = aid.split("_")[1];
+    var val_array = new Array(); 
+
     actuator = actuators[actuatorID];
-    actuator.bind({
-        onBind:function(service){
-        	var r = service.range;
-        	var val_array=new Array(); 
 
-        	//if the user has setted a specific value for "true" and "false" - I send these values to the actuator!
-        	if( $('#actuator_false_'+aid).val()!=="" || $('#actuator_true_'+aid).val()!=="" ){
-        		if(state > 0){
-        			if($('#actuator_true_'+aid).val()!=="")
-        				val_array[0]=parseFloat($('#actuator_true_'+aid).val());
-        			else
-        				val_array[0]=parseFloat(1);
-        		}
-        		else{
-        			if($('#actuator_false_'+aid).val()!=="")
-        				val_array[0]=parseFloat($('#actuator_false_'+aid).val());
-        			else
-        				val_array[0]=parseFloat(0);
-        		}
-        	}
-        	else{
-        		//now, I verify if the actuator is binary or decimal
-	        	if(r[0].length==2){
-	        		if(r[0][0]==0 && r[0][1]==1){
-	        			//binary actuator
-	        			if(state>0)
-	        				val_array[0]=parseFloat(1);
-	        			else
-	        				val_array[0]=parseFloat(0);
-	        		}else{
-	        			//"decimal" actuator
-	        			val_array[0]=parseFloat(state);
-	        		}
-	        	}else{
-	        		val_array[0]=parseFloat(state);
-	        	}
-        	}
-            try{
+    if(actuator.api.indexOf("twitter") !== -1 || actuator.api.indexOf("facebook") !== -1){
+    	val_array = getValueForExernalServices(aid);
+    }
+    else{
+    	val_array = getValueForRealActuator(aid, actuatorID, state);
+	}
 
-                actuator.setValue(val_array,
-                    function(actuatorEvent){
-                        $("#value_"+aid).empty();
-						$("#value_"+aid).text(actuatorEvent.actualValue[0]);
-                    },
-                    function(actuatorError){
-                        //alert("[ERROR] on actuators set state: "+JSON.stringify(actuatorError));
-                    }
-                );
-            }
-            catch(err){
-                console.log("Not a valid webinos actuator: " + err.message);
-            }
-        }
-    });
+
+	if(val_array[0] != argumentsObj.prevVal[0]){
+		try{
+			actuator.setValue(val_array,
+		        function(actuatorEvent){
+		            $("#value_"+aid).empty();
+					$("#value_"+aid).text(actuatorEvent.actualValue[0]);
+					values_sa[actuatorEvent.actuatorId] = actuatorEvent.actualValue[0];
+		        },
+		        function(actuatorError){
+		        }
+		    );
+	    }
+	    catch(err){
+	        console.log("Not a valid webinos actuator: " + err.message);
+	    }
+	}
+	
+    return val_array;
 }
 
 
+function getValueForExernalServices(aid){
+    var text = textToPost[aid];
+	var regExpress = / /;
+	var text_sensor_split = text.split(regExpress);
+	var str_post = "";
+	for(var t in text_sensor_split){
+		if( text_sensor_split[t].indexOf("[SENSOR]") !== -1 ){
+			var regExpressSensor = /[(SENSOR)\].\[\/(SENSOR)]/;
+			var tmp_1 = text_sensor_split[t].split(regExpressSensor);
+			for(var y in tmp_1){
+				if((tmp_1[y] in values_sa) && tmp_1[y].length != 0){
+					str_post = str_post + " " + values_sa[tmp_1[y]];
+				}
+				else {
+					if (tmp_1[y].length != 0)
+						str_post = str_post + " " + tmp_1[y];
+				}
+			}
+		}else if( text_sensor_split[t].indexOf("[ACTUATOR]") !== -1 ){
+			var regExpressActuator = /[(ACTUATOR)\].\[\/(ACTUATOR)]/;
+			var tmp_2 = text_sensor_split[t].split(regExpressActuator);
+			for(var y in tmp_2){
+				if((tmp_2[y] in values_sa) && tmp_2[y].length != 0){
+					str_post = str_post + " " + values_sa[tmp_2[y]];
+				}
+				else{
+					if (tmp_2[y].length != 0)
+						str_post = str_post + " " + tmp_2[y];
+				}
+			}
+		}else{
+			str_post = str_post + " " + text_sensor_split[t];
+		}
+	}
+
+	return new Array(str_post);
+}
+
+function getValueForRealActuator(aid, actuatorID, state){
+	var r = actuators[actuatorID].range;
+	var val_array = new Array();
+	//if the user has setted a specific value for "true" and "false" - I send these values to the actuator!
+	if( $('#actuator_false_'+aid).val()!=="" || $('#actuator_true_'+aid).val()!=="" ){
+		if(state > 0){
+			if($('#actuator_true_'+aid).val()!=="")
+				val_array[0]=parseFloat($('#actuator_true_'+aid).val());
+			else
+				val_array[0]=parseFloat(1);
+		}
+		else{
+			if($('#actuator_false_'+aid).val()!=="")
+				val_array[0]=parseFloat($('#actuator_false_'+aid).val());
+			else
+				val_array[0]=parseFloat(0);
+		}
+	}
+	else{
+		//now, I verify if the actuator is binary or decimal
+    	if(r[0].length==2){
+    		if(r[0][0]==0 && r[0][1]==1){
+    			//binary actuator
+    			if(state>0)
+    				val_array[0]=parseFloat(1);
+    			else
+    				val_array[0]=parseFloat(0);
+    		}else{
+    			//"decimal" actuator
+    			val_array[0]=parseFloat(state);
+    		}
+    	}else{
+    		val_array[0]=parseFloat(state);
+    	}
+	}
+	return val_array;
+}
 
 /***************************  HELP FUNCTION TO ASSOCIATE LOGIC WITH GUI  ***************************/
 
@@ -327,7 +426,9 @@ function settingUserInputConnection(source,target, position){
 		//event onchange or onkeyup?
 		$('#input_val_'+source).on('keyup', function(){
 			var vall = this.value;
-		    block_list[source].input_callback(vall);
+			//if vall is not empty
+			//if(vall.length != 0)
+		    	block_list[source].input_callback(vall);
 		});
 		textinput_array.push(source);
 	}
