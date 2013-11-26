@@ -43,9 +43,12 @@ To have webinos-driver-ant installed -
     git clone https://github.com/ziransun/webinos-driver-ant/
     mv webinos-driver-ant ./node_modules/webinos-api-iot/node_modules/
     
+    git clone https://github.com/ziransun/webinos-driver-oximeter
+    mv webinos-driver-oximeter ./node_modules/webinos-api-iot/node_modules/
+    
 To have quarqd-ext daemon built and run to support ant+ connectivity. README file has given instructions on daemon setup at 
   
-    https://github.com/ziransun/quarqd-ext
+    git clone -b pedo https://github.com/ziransun/quarqd-ext
     
 Finally, add healthhub in  
 
